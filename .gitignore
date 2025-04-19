@@ -1,15 +1,51 @@
-# Node
+# === Node.js ===
 node_modules/
 dist/
-.env
-
-# React
-frontend/node_modules/
-frontend/build/
-
-# Logs
+build/
 *.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+.pnpm-debug.log
 
-# OS
+# === Environment Variables ===
+.env
+.env.*.local
+
+# === React Frontend (clientSide & adminDashboard) ===
+FrontEnd/node_modules/
+FrontEnd/build/
+admin-dashboard/node_modules/
+admin-dashboard/build/
+
+# === Coverage Reports ===
+coverage/
+.nyc_output/
+
+# === Editor & OS Files ===
 .DS_Store
 Thumbs.db
+.idea/
+.vscode/
+*.sublime-workspace
+
+# === System ===
+*.pid
+*.seed
+*.pid.lock
+debug.log
+pids/
+temp/
+tmp/
+*.tmp
+*.swp
+
+# === Optional: Vite or Next.js (if you switch later) ===
+.vite/
+.next/
+
+# === Optional: Swagger ===
+swagger-output.json
+
+# === Optional: Cache ===
+.cache/

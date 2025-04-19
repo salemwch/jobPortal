@@ -1,5 +1,5 @@
 export class CreateAuthDto {
-    email: string;
-    password: string;
-    refreshToken: string;
+  email: string;
+  password: string;
+  refreshToken: string;
 }

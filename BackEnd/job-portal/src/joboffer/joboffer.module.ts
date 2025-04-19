@@ -10,9 +10,16 @@ import { TestJobApplicationModule } from 'src/testjobapplication/testjobapplicat
 import { MailModule } from 'src/mailtrap/mailmodule';
 
 @Module({
-  imports: [MongooseModule.forFeature([{name: 'JobOffer', schema: JobOfferSchema },]), UserModule, forwardRef(()=>JobApplicationModule) , forwardRef(() =>TestJobApplicationModule) , MailModule, forwardRef(() => CompanyModule)],
+  imports: [
+    MongooseModule.forFeature([{ name: 'JobOffer', schema: JobOfferSchema }]),
+    UserModule,
+    forwardRef(() => JobApplicationModule),
+    forwardRef(() => TestJobApplicationModule),
+    MailModule,
+    forwardRef(() => CompanyModule),
+  ],
   controllers: [JobOfferController],
   providers: [JobOfferService],
-  exports: [JobOfferService,MongooseModule],
+  exports: [JobOfferService, MongooseModule],
 })
 export class JobOfferModule {}

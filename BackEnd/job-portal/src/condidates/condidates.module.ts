@@ -6,10 +6,14 @@ import { EvaluationModule } from '../evaluation/evaluation.module';
 import { JobApplicationModule } from '../jobapplication/jobapplication.module';
 import { TestJobApplicationModule } from '../testjobapplication/testjobapplication.module';
 
-
 @Module({
-  imports:[   CondidatesModule,UserModule, EvaluationModule, forwardRef(() => JobApplicationModule, ), forwardRef(() => TestJobApplicationModule)
-],
+  imports: [
+    CondidatesModule,
+    UserModule,
+    EvaluationModule,
+    forwardRef(() => JobApplicationModule),
+    forwardRef(() => TestJobApplicationModule),
+  ],
   controllers: [CondidatesController],
   providers: [CondidatesService],
 })

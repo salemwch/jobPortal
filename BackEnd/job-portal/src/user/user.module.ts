@@ -12,13 +12,18 @@ import { CommentModule } from 'src/comment/comment.module';
   imports: [
     MongooseModule.forFeature([
       {
-      name: 'user', schema: UserSchema, discriminators: [{name: "admin", schema: adminSchema}, {name: "condidate", schema: CondidateSchema}, {name: "company", schema: CopmanySchema}]
-        
-      }]),
-
+        name: 'user',
+        schema: UserSchema,
+        discriminators: [
+          { name: 'admin', schema: adminSchema },
+          { name: 'condidate', schema: CondidateSchema },
+          { name: 'company', schema: CopmanySchema },
+        ],
+      },
+    ]),
   ],
   controllers: [UserController],
   providers: [UserService],
-  exports: [UserService,MongooseModule],
+  exports: [UserService, MongooseModule],
 })
 export class UserModule {}

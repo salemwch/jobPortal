@@ -1,3 +1,3 @@
-export class resetdto{
-    password: string;
+export class resetdto {
+  password: string;
 }

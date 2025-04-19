@@ -40,9 +40,12 @@ export class Comment extends Document {
     message: string;
     responder: string;
   }[];
-  
 
-  @Prop({ type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' })
+  @Prop({
+    type: String,
+    enum: ['pending', 'approved', 'rejected'],
+    default: 'pending',
+  })
   status: string;
 }
 

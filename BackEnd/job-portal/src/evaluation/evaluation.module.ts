@@ -5,8 +5,11 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { EvaluationSchema } from './entities/evaluation.entity';
 
 @Module({
-  imports:[MongooseModule.forFeature([{name: 'Evaluation', schema: EvaluationSchema
-  }])],
+  imports: [
+    MongooseModule.forFeature([
+      { name: 'Evaluation', schema: EvaluationSchema },
+    ]),
+  ],
   controllers: [EvaluationController],
   providers: [EvaluationService],
 })

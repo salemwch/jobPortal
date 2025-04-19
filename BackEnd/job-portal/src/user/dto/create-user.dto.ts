@@ -1,4 +1,14 @@
-import { IsEmail, IsEnum, IsIn, IsNotEmpty, IsNumber, IsOptional, IsString, Matches, MinLength } from 'class-validator';
+import {
+  IsEmail,
+  IsEnum,
+  IsIn,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Matches,
+  MinLength,
+} from 'class-validator';
 import { UserRole } from '../../userRole/userRole';
 import { Type } from 'class-transformer';
 
@@ -11,11 +21,9 @@ export class CreateUserDto {
   @IsNotEmpty()
   email: string;
   @IsNumber()
-    @IsNotEmpty()
-    @Type(()=>
-    Number
-    )
-    phone: number;
+  @IsNotEmpty()
+  @Type(() => Number)
+  phone: number;
   @IsString()
   @IsNotEmpty()
   @MinLength(6, { message: 'password at least be 6 charachters' })
@@ -29,5 +37,4 @@ export class CreateUserDto {
   @IsOptional()
   @IsString()
   image?: string;
-  
 }

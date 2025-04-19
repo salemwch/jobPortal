@@ -9,12 +9,13 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { UserSchema } from 'src/user/entities/user.entity';
 import { CopmanySchema } from './entities/company.entity';
 
-
-
 @Module({
-  imports: [ forwardRef(() => UserModule)
-  ,forwardRef(() => TestJobApplicationModule), forwardRef(() => MailModule),
-  forwardRef(() => JobOfferModule)] ,
+  imports: [
+    forwardRef(() => UserModule),
+    forwardRef(() => TestJobApplicationModule),
+    forwardRef(() => MailModule),
+    forwardRef(() => JobOfferModule),
+  ],
   controllers: [CompanyController],
   providers: [CompanyService],
   exports: [CompanyService],

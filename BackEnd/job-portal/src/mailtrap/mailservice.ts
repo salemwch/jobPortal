@@ -1,21 +1,24 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
-import { MailerService } from '@nestjs-modules/mailer';
 import { JobApplicationService } from 'src/jobapplication/jobapplication.service';
 import { JobOfferService } from 'src/joboffer/joboffer.service';
 import { ICompany, PopulatedJobOffer } from 'src/company/Interface/Interface';
-import { IJobOffer } from 'src/joboffer/interface/InterfaceJobOffer';
-import mongoose from 'mongoose';
-import { JobOffer } from 'src/joboffer/entities/joboffer.entity';
+import { MailerService } from '@nestjs-modules/mailer';
 
 @Injectable()
 export class MailService {
-  constructor(private readonly mailerService: MailerService,
+  constructor(
+    private readonly mailerService: MailerService,
     @Inject(forwardRef(() => JobApplicationService))
-    private readonly jobOfferModel : JobOfferService
+    private readonly jobOfferModel: JobOfferService
   ) {}
-  async sendContactEmail(name: string, email: string, subject: string, message: string) {
+  async sendContactEmail(
+    name: string,
+    email: string,
+    subject: string,
+    message: string
+  ) {
     await this.mailerService.sendMail({
-      to: 'salemwachwacha1997@gmail.com', 
+      to: 'salemwachwacha1997@gmail.com',
       from: '"Contact Form" <noreply@yourdomain.com>',
       subject: subject,
       text: `From: ${name} <${email}>\n\n${message}`,
@@ -29,18 +32,27 @@ export class MailService {
     experience?: string;
     motivationLetter?: string;
     cvUrl: string;
-    jobOffer: PopulatedJobOffer;  
+    jobOffer: PopulatedJobOffer;
     to: string;
   }) {
-    const { name, location, experience, motivationLetter, jobOffer, cvUrl, to } = applicationData;
-  
+    const {
+      name,
+      location,
+      experience,
+      motivationLetter,
+      jobOffer,
+      cvUrl,
+      to,
+    } = applicationData;
+
     const jobTitle = jobOffer.title;
-    const jobDescription = jobOffer.description;  
-    const companyName = applicationData.jobOffer.company?.name ?? 'Not Provided';  
-  
+    const jobDescription = jobOffer.description;
+    const companyName =
+      applicationData.jobOffer.company?.name ?? 'Not Provided';
+
     // Send the email
     await this.mailerService.sendMail({
-      to: to, 
+      to: to,
       from: '"Job Application" <noreply@yourdomain.com>',
       subject: `New Job Application for ${jobTitle}`,
       text: `
@@ -63,12 +75,7 @@ export class MailService {
         <p><b>CV:</b> <a href="${cvUrl}">${cvUrl}</a></p>
       `,
     });
-  
+
     return { message: 'Job application email sent successfully' };
   }
-  
-  
-  
-  
-  
 }

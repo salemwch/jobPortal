@@ -11,9 +11,13 @@ import { adminSchema } from './entities/admin.entity';
 import { CondidatesModule } from 'src/condidates/condidates.module';
 
 @Module({
-  imports: [MongooseModule.forFeature([{name: 'user', schema: UserSchema } ]),
-  JobOfferModule,forwardRef(() => JobApplicationModule)
-  ,TestJobApplicationModule, UserModule],
+  imports: [
+    MongooseModule.forFeature([{ name: 'user', schema: UserSchema }]),
+    JobOfferModule,
+    forwardRef(() => JobApplicationModule),
+    TestJobApplicationModule,
+    UserModule,
+  ],
   controllers: [AdminController],
   providers: [AdminService],
   exports: [MongooseModule],

@@ -1,0 +1,168 @@
+/* General Form Styling */
+.formdat {
+  background-color: #fff;
+  padding: 30px;
+  width: 100%;
+  max-width: 700px;
+  border-radius: 12px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  margin: 0 auto;
+  font-family: 'Roboto', sans-serif;
+}
+
+/* Form Title */
+h2 {
+  text-align: center;
+  font-size: 24px;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 25px;
+}
+
+/* Styling for form labels */
+label {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: #555;
+  display: block;
+}
+
+/* Common Styling for Input, Textarea, and Select */
+input[type="text"],
+textarea,
+select,
+input[type="file"] {
+  width: 100%;
+  padding: 14px;
+  margin-bottom: 18px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #333;
+  box-sizing: border-box;
+}
+
+/* Textarea specific styling */
+textarea {
+  resize: vertical;
+  min-height: 120px;
+  max-height: 250px;
+}
+
+/* File input specific padding for better visibility */
+input[type="file"] {
+  padding: 10px 0;
+}
+
+/* Focus state for inputs, textareas, selects */
+input[type="text"]:focus,
+textarea:focus,
+select:focus,
+input[type="file"]:focus {
+  border-color: #4CAF50;
+  box-shadow: 0 0 8px rgba(76, 175, 80, 0.2);
+  outline: none;
+}
+
+/* Styling for buttons */
+button {
+  background-color: #4CAF50;
+  color: white;
+  padding: 15px;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px;
+  width: 100%;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  box-sizing: border-box;
+}
+
+button:hover {
+  background-color: #45a049;
+  transform: translateY(-2px);
+}
+
+button:active {
+  background-color: #388e3c;
+  transform: translateY(0);
+}
+
+/* Disabled select state */
+select:disabled {
+  background-color: #f4f4f4;
+  cursor: not-allowed;
+}
+
+option:disabled {
+  color: #888;
+}
+
+
+
+/* Spacing between button and the rest of the form */
+button {
+  margin-top: 15px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  form {
+    padding: 20px;
+    width: 90%;
+  }
+  h2 {
+    font-size: 22px;
+    margin-bottom: 20px;
+  }
+  input[type="text"],
+  textarea,
+  select,
+  input[type="file"] {
+    font-size: 13px;
+    padding: 12px;
+  }
+  button {
+    font-size: 15px;
+    padding: 14px;
+  }
+}
+
+/* Mobile-friendly File input */
+input[type="file"] {
+  padding: 10px 0;
+  border: 1px solid #ddd;
+  color: transparent;
+  cursor: pointer;
+}
+
+/* Success or error states for form */
+input:valid,
+textarea:valid,
+select:valid {
+  border-color: #4CAF50;
+}
+
+input:invalid,
+textarea:invalid,
+select:invalid {
+  border-color: #f44336;
+}
+
+/* Placeholder styling */
+input::placeholder,
+textarea::placeholder {
+  color: #aaa;
+}
+.no-test-message {
+  background-color: #f0f8ff;
+  color: #007bff;
+  border: 1px solid #b3d7ff;
+  padding: 1rem;
+  margin: 1rem;
+  border-radius: 8px;
+  font-weight: bold;
+  text-align: center;
+}
+

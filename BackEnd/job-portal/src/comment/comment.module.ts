@@ -7,7 +7,10 @@ import { JobOfferModule } from 'src/joboffer/joboffer.module';
 import { UserModule } from 'src/user/user.module';
 
 @Module({
-  imports:[MongooseModule.forFeature([{name : 'comment', schema: commentSchema}]), JobOfferModule],
+  imports: [
+    MongooseModule.forFeature([{ name: 'comment', schema: commentSchema }]),
+    JobOfferModule,
+  ],
   controllers: [CommentController],
   providers: [CommentService],
 })

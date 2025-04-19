@@ -16,13 +16,25 @@ import { NotificationModule } from './notification/notification.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { MailModule } from './mailtrap/mailmodule';
 
-
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://localhost:27017',{
+    MongooseModule.forRoot('mongodb://localhost:27017', {
       dbName: 'JobPortal',
     }),
-    UserModule, AuthModule, AdminModule, CondidatesModule, CompanyModule, JobOfferModule, JobApplicationModule, TestJobApplicationModule, CommentModule, EvaluationModule, NotificationModule, DashboardModule, MailModule],
+    UserModule,
+    AuthModule,
+    AdminModule,
+    CondidatesModule,
+    CompanyModule,
+    JobOfferModule,
+    JobApplicationModule,
+    TestJobApplicationModule,
+    CommentModule,
+    EvaluationModule,
+    NotificationModule,
+    DashboardModule,
+    MailModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

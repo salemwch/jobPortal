@@ -1,6 +1,5 @@
-import { Controller, Get,Query} from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
 import { UserService } from './user.service';
-
 
 @Controller('user')
 export class UserController {
@@ -9,5 +8,4 @@ export class UserController {
   async getRecentUsers(@Query('limit') limit: number = 5) {
     return this.userService.getRecentUsers(limit);
   }
-
 }

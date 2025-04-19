@@ -1,8 +1,8 @@
-import { IsIn, IsNotEmpty, IsString } from "class-validator";
+import { IsIn, IsNotEmpty, IsString } from 'class-validator';
 
-export class ModerateCommentDto{
-    @IsString()
-    @IsNotEmpty()
-    @IsIn(['approved', 'rejected'])
-    status: 'approved' | 'rejected'; 
+export class ModerateCommentDto {
+  @IsString()
+  @IsNotEmpty()
+  @IsIn(['approved', 'rejected'])
+  status: 'approved' | 'rejected';
 }

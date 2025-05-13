@@ -19,10 +19,10 @@ const Contact = () => {
     e.preventDefault();
     try {
       await axios.post('http://localhost:3000/mail/send', formData);
-      alert('Message sent successfully! ✅');
+      alert('Message sent successfully! ');
       setFormData({ name: '', email: '', subject: '', message: '' }); // reset
     } catch (err) {
-      console.error('Failed to send message ❌', err);
+      console.error('Failed to send message ', err);
       alert('Something went wrong, please try again.');
     }
   };

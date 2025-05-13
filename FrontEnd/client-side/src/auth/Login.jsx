@@ -27,6 +27,7 @@ const Login = () => {
       .then((res) => {
         const user = res.data?.user;
         const role = user?.role;
+        // Switched from localStorage to sessionStorage to ensure user data is cleared on tab/browser close for better security and Avoids issues when using multiple tabs. 
         sessionStorage.setItem('user', JSON.stringify(res.data));
         if(role === 'condidate'){
           navigate('/condidateDashboard');

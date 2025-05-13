@@ -223,7 +223,7 @@ const handleDelete = async (id) => {
     }}
   />
 </Link>
-{/* 🔔 Notification Dropdown */}
+{/*  Notification Dropdown */}
 <div className="dropdown">
   <button
     className="btn btn-outline-white border-width-2 d-none d-lg-inline-block dropdown-toggle"

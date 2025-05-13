@@ -48,9 +48,8 @@ const Footer = () => {
       <div className="row text-center">
         <div className="col-12">
           <p className="copyright"><small>
-              {/* Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. */}
               Copyright © All rights reserved | This template is made with <i className="icon-heart text-danger" aria-hidden="true" /> by <a href="https://colorlib.com" target="_blank" rel="noreferrer">Colorlib</a>
-              {/* Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. */}</small></p>
+              </small></p>
         </div>
       </div>
     </div>

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import statistic from "../../services/statistic";
 import condidateService from "../../services/condidateService";
 const CompaniesStatistics = () =>{
-    const [condidates, setCondidates] = useState([]);
+  const [condidates, setCondidates] = useState([]);
   const [token, setToken] = useState("");
   useEffect(() => {
     const storedUser = JSON.parse(sessionStorage.getItem("user"));

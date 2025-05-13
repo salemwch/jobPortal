@@ -7,12 +7,13 @@ A professional, full-featured job portal built with **NestJS**, **MongoDB**, and
 ## 🚀 Technologies Used
 
 ### 🔧 Backend (NestJS + MongoDB)
-- **NestJS 10** — Scalable backend framework
-- **MongoDB & Mongoose** — NoSQL database
+- **Node.js** — JavaScript runtime powering the backend
+- **NestJS 10** — Scalable and modular backend frameWork built on Node.js
+- **MongoDB & Mongoose** — NoSQL databasefor flexible data models
 - **Multer** — File uploading (profile images & CVs)
 - **UUID** — Unique identifiers
-- **Role-based access guards**
-- **Password reset & Email notification system**
+- **Role-based access guards** — Secure routes by user roles
+- **Password reset & Email notification system** — User recovery and notifications
 
 ### 🎨 Frontend (React.js)
 - **React 19** with Hooks & Functional Components
@@ -20,7 +21,7 @@ A professional, full-featured job portal built with **NestJS**, **MongoDB**, and
 - **Axios** — API communication
 - **Bootstrap & React-Bootstrap** — Styling & layout
 - **User dashboards** for each role
-
+- **WebSocket & Socket.IO** Real-time communication for notifications and updates
 ---
 
 ## 👥 User Roles & Features
@@ -51,15 +52,17 @@ A professional, full-featured job portal built with **NestJS**, **MongoDB**, and
 
 ## 🧠 Key Functionalities
 
-- ✅ Full Authentication System (Register, Login, Reset Password)
+- ✅ Full Authentication System (Register, Login, Reset Password,forget Password)
 - ✅ Role-Based Access (Admin, Company, Condidate, Visitor)
 - ✅ File Uploads (CVs, Profile Images)
 - ✅ Job Offer Posting & Management
 - ✅ Condidate Evaluation via Test
 - ✅ Comments & Company Responses
-- ✅ Notifications for Applications & Updates
+- ✅ Notifications for Job Applications, Craetion Of JobOffers,  & Updates
 - ✅ Dashboards for Each User Role
 - ✅ Real-Time Statistics (Most Active, Most Visited, etc.)
+- ✅ WebSockets, Socket.IO 
+
 
 ---
 
@@ -72,8 +75,15 @@ A professional, full-featured job portal built with **NestJS**, **MongoDB**, and
 `components`, `home`, `comment`, `myProfile`, `RecenUser`, `TopVisited`, `auth`, `services`, `dataTable`, `manages`
 
 ### Frontend (Company & Condidate):
-`auth`, `components`, `jobOffer`, `condidateDashboard`, `services`, `pages`, `views`
+`auth`, `components`, `jobOffer`, `condidateDashboard`, `services`, `pages`, `views`,`helper`,`Profile`, `RoleBasedStatistic`,`search`,`companies`, `DashboardCompany`
 
+### 🔐 Storage Decision
+
+- We use `sessionStorage` instead of `localStorage` for storing login sessions.
+- This ensures:
+  - User data clears when the tab is closed.
+  - Better security on shared/public machines.
+  - Avoids issues when using multiple tabs.
 ---
 
 

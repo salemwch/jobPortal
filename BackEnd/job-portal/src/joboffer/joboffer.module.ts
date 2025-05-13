@@ -3,11 +3,12 @@ import { JobOfferService } from './joboffer.service';
 import { JobOfferController } from './joboffer.controller';
 import { UserModule } from 'src/user/user.module';
 import { MongooseModule } from '@nestjs/mongoose';
-import { JobOffer, JobOfferSchema } from './entities/joboffer.entity';
+import { JobOfferSchema } from './entities/joboffer.entity';
 import { CompanyModule } from 'src/company/company.module';
 import { JobApplicationModule } from 'src/jobapplication/jobapplication.module';
 import { TestJobApplicationModule } from 'src/testjobapplication/testjobapplication.module';
 import { MailModule } from 'src/mailtrap/mailmodule';
+import { NotificationModule } from 'src/notification/notification.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { MailModule } from 'src/mailtrap/mailmodule';
     forwardRef(() => TestJobApplicationModule),
     MailModule,
     forwardRef(() => CompanyModule),
+    NotificationModule,
   ],
   controllers: [JobOfferController],
   providers: [JobOfferService],

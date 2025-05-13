@@ -1,52 +1,72 @@
-import {
-  BadGatewayException,
-  BadRequestException,
-  Injectable,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateJobOfferDto } from './dto/createjoboffer.dto';
 import { UpdateJobOfferDto } from './dto/updatejoboffer.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { IJobOffer } from './interface/InterfaceJobOffer';
 import { JobOffer } from './entities/joboffer.entity';
 import { ICompany } from 'src/company/Interface/Interface';
 import { IJobTest } from 'src/testjobapplication/interface/interfacetest';
 import { TestJobApplication } from 'src/testjobapplication/entities/testjobapplication.entity';
+import { ICondidate } from 'src/condidates/Interface/interface';
+import { NotificationService } from 'src/notification/notification.service';
 
 @Injectable()
 export class JobOfferService {
   constructor(
     @InjectModel('JobOffer') private jobOfferModel: Model<IJobOffer>,
     @InjectModel('company') private readonly companyModel: Model<ICompany>,
+    @InjectModel('condidate')
+    private readonly condidateModel: Model<ICondidate>,
     @InjectModel('TestJobApplication')
-    private testJobApplicationModel: Model<IJobTest>
-  ) {
-    console.log(
-      'Constructor: typeof findById',
-      typeof this.jobOfferModel.findById
-    );
-  }
+    private testJobApplicationModel: Model<IJobTest>,
+    private readonly notificationService: NotificationService
+  ) {}
+
   async create(createJobOfferDto: CreateJobOfferDto): Promise<IJobOffer> {
     const companyId = createJobOfferDto.company;
     const existCompany = await this.companyModel.findById(companyId);
     if (!existCompany) {
       throw new BadRequestException(
-        `company with id ${createJobOfferDto.company} does not exist `
+        `Company with id ${companyId} does not exist`
       );
     }
     if (existCompany.status !== 'approved') {
       throw new BadRequestException(
-        `company with id ${companyId} is  not approved to create job Offer`
+        `Company with id ${companyId} is not approved to create job offers`
       );
     }
+    // 1. Save job offer
     const newJobOffer = new this.jobOfferModel(createJobOfferDto);
     const savedJobOffer = await newJobOffer.save();
-
+    // 2. Update company with job offer reference
     await this.companyModel.findByIdAndUpdate(
       companyId,
       { $push: { jobOffers: savedJobOffer._id } },
       { new: true }
     );
+    // 3. Get condidates from same location
+    const condidates = await this.condidateModel.find({
+      location: createJobOfferDto.location,
+    });
+    // 4. Notify matching condidates based on skills
+    for (const condidate of condidates) {
+      const condidateSkills = condidate.skills || [];
+      const jobSkills = createJobOfferDto.requiredSkills || [];
+      const skillMatch = condidateSkills.some(skills =>
+        jobSkills.includes(skills)
+      );
+      if (skillMatch) {
+        const message = `A new job offer matching your skills and location has been posted by ${existCompany.name}`;
+        const jobOfferId = savedJobOffer._id as Types.ObjectId;
+        await this.notificationService.create({
+          user: condidate._id.toString(),
+          message,
+          type: 'jobMatch',
+          jobOffer: jobOfferId.toString(),
+        });
+      }
+    }
     return savedJobOffer;
   }
   async update(
@@ -65,10 +85,6 @@ export class JobOfferService {
   }
   async findById(id: string): Promise<IJobOffer> {
     try {
-      // Log the ID being searched for
-      console.log(`Searching for JobOffer with ID: ${id}`);
-
-      // Attempt to find the job offer
       const jobOffer = await this.jobOfferModel
         .findById(id)
         .populate('company');
@@ -127,7 +143,7 @@ export class JobOfferService {
     try {
       return this.jobOfferModel.find(filters).populate('company').exec();
     } catch (error) {
-      throw new BadRequestException('error during searc');
+      throw new BadRequestException('error during searc', error);
     }
   }
   async incrementViewCount(id: string): Promise<JobOffer> {

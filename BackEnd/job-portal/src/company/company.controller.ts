@@ -122,7 +122,7 @@ export class CompanyController {
     @UploadedFile() file
   ) {
     try {
-      if (file && file.name) {
+      if (file && file.filename) {
         updateCompanyDto.image = file.filename;
       }
       const updatedCompany = await this.companyService.updateCompany(

@@ -1,5 +1,5 @@
 import './App.css';
-import { Navigate,  Route, BrowserRouter as  Router, Routes } from 'react-router-dom';
+import { Navigate,  Outlet,  Route, BrowserRouter as  Router, Routes } from 'react-router-dom';
 import Home from './views/Home';
 import Layout from './views/Layout';
 import Login from './auth/Login';
@@ -16,16 +16,22 @@ import CondidateDashboard from './condidate/CondidateDashboard';
 import JobOfferDetails from './jobOffer/JobOfferDetails';
 import Contact from './pages/contact';
 import JobApplicationForm from './jobOffer/JobApplicationForm';
-function PrivateRoute({ children }) {
-  const user = localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : null;
+import CondidateProfile from './Profile/CondidateProfile';
+import JobResults from './search/JobResults';
+import RoleBasedStatistics from './RoleBasedStatistic/RoleStatistics';
+import DashboardCompanie from './Companies/DashboardCompanie';
+import CompanyProfile from './Companies/companieProfile/CompanyProfile';
+function PrivateRoute({  allowedRoles }) {
+  const user = sessionStorage.getItem("user") ? JSON.parse(sessionStorage.getItem("user")): null;
 
-  if (!user || (user.user.role !== "company" && user.user.role !== "condidate")) {
-    alert("Only company and condidate can log here  can log  here.");
+  if (!user || !allowedRoles.includes(user.user.role)) {
+    alert("Access denied.");
     return <Navigate to="/login" />;
   }
 
-  return children;
+  return <Outlet />;
 }
+
 
 function App() {
   return (
@@ -40,15 +46,23 @@ function App() {
         <Route path ='/Carrer' element={<Careers/>}/>
         <Route path ='/Blog' element={<Blog/>}/>
         <Route path ='/Contact' element={<Contact/>}/>
-        <Route path ='/condidateDashboard' element={ <PrivateRoute> <CondidateDashboard/> </PrivateRoute>}/>
+        <Route element={<PrivateRoute allowedRoles={['condidate']} />}>
+        <Route path ='/condidateDashboard' element={  <CondidateDashboard/> }/>
         <Route path = '/JobApplicationForm' element={ <JobApplicationForm></JobApplicationForm> }/>
         <Route path="/apply/:jobOfferId" element={<JobApplicationForm/>} />
-
+        <Route path="/condidates/:id" element={<CondidateProfile/>} />
         <Route path ='/job-offer/:id' element={<JobOfferDetails/>}/>
+        <Route path="/job-results" element={<JobResults />} />
+        </Route>
+        <Route element ={<PrivateRoute allowedRoles={['company']} />}>
+        <Route path="/DashboardCompanie" element={<DashboardCompanie/>}/>
+        <Route path ="/company/:id" element={<CompanyProfile/>}/>
+        </Route>
+        <Route path="/Statistics" element= {<RoleBasedStatistics/>}/>
         <Route path ="/login" element = {<Login/>}/>
         <Route path="/SignUpConfirmation" element={<SignUpConfirmation/>}/>
         <Route path="/register" element={<Register/>} />
-        <Route path="/ResetPassword" element={<ResetPassword/>}/>
+        <Route path="/auth/reset-password/:token" element={<ResetPassword/>}/>
         <Route path="/ForgetPassword" element={<ForgetPassword/>}/>
         </Routes>
     </Router>

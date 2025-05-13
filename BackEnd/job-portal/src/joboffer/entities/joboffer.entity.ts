@@ -11,6 +11,8 @@ export class JobOffer extends Document {
   requirements: string;
   @Prop()
   location?: string;
+  @Prop({ type: [String], required: true })
+  requiredSkills: string[];
   @Prop({ required: true })
   salary: string;
   @Prop({ type: SchemaTypes.ObjectId, ref: 'company', required: true })

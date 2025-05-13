@@ -10,17 +10,17 @@ import {
   HttpStatus,
   Query,
   Put,
-  UseGuards,
   UseInterceptors,
-  UploadedFiles,
+  UploadedFile,
 } from '@nestjs/common';
 import { JobApplicationService } from './jobapplication.service';
 import { CreateJobApplicationDto } from './dto/create-job-application.dto';
-import { response } from 'express';
 import { UpdateJobApplicationDto } from './dto/update-job-application.dto';
 import { ApplicationStatus } from './enumApplication';
 import { MailService } from 'src/mailtrap/mailservice';
-import { FilesInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor } from '@nestjs/platform-express';
+import * as path from 'path';
+import { diskStorage } from 'multer';
 
 @Controller('jobapplication')
 export class JobApplicationController {
@@ -30,32 +30,48 @@ export class JobApplicationController {
   ) {}
 
   @Post()
-  @UseInterceptors(FilesInterceptor('cvUrl'))
+  @UseInterceptors(
+    FileInterceptor('cvUrl', {
+      storage: diskStorage({
+        destination: './uploads',
+        filename: (req, file, cb) => {
+          const uniqueSuffix =
+            Date.now() + '-' + Math.round(Math.random() * 1e9);
+          const ext = path.extname(file.originalname);
+          cb(null, `${file.fieldname}-${uniqueSuffix}${ext}`);
+        },
+      }),
+    })
+  )
   async create(
     @Res() response,
-    @UploadedFiles() files: Express.Multer.File[], // Files array
-    @Body() createJobApplicationDto: CreateJobApplicationDto
+    @UploadedFile() file: Express.Multer.File,
+    @Body() createJobApplicationDto: CreateJobApplicationDto,
   ) {
     try {
-      //  Attach file to DTO
-      if (files && files.length > 0) {
-        createJobApplicationDto.cvUrl = files[0].filename; // Save the filename or path
+      // Attach file name to DTO
+      if (file) {
+        createJobApplicationDto.cvUrl = file.filename;
       }
 
-      // Make sure condidate and jobOffer are valid MongoDB ObjectIds
-      if (!this.isValidObjectId(createJobApplicationDto.condidate)) {
-        throw new Error('Invalid condidate ID');
-      }
-      if (!this.isValidObjectId(createJobApplicationDto.jobOffer)) {
-        throw new Error('Invalid jobOffer ID');
+      // Validate condidate and jobOffer IDs
+      if (
+        !createJobApplicationDto.condidate ||
+        !this.isValidObjectId(createJobApplicationDto.condidate)
+      ) {
+        throw new Error('Invalid or missing condidate ID');
       }
 
-      //  Create job application
+      if (
+        !createJobApplicationDto.jobOffer ||
+        !this.isValidObjectId(createJobApplicationDto.jobOffer)
+      ) {
+        throw new Error('Invalid or missing jobOffer ID');
+      }
+
       const createdJobApplication = await this.jobApplicationService.create(
-        createJobApplicationDto
+        createJobApplicationDto,
       );
-
-      //  Send email to the company with the CV download link
 
       return response.status(HttpStatus.CREATED).json({
         message: 'Job application created successfully',

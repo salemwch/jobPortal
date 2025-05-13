@@ -101,10 +101,7 @@ option:disabled {
 
 
 
-/* Spacing between button and the rest of the form */
-button {
-  margin-top: 15px;
-}
+
 
 /* Responsive Design */
 @media (max-width: 768px) {

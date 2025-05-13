@@ -1,16 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  Res,
-  HttpStatus,
-  Query,
-  UseGuards,
-  NotFoundException,
+import {Controller,Get,Post,Body,Patch,Param,Delete,Res,HttpStatus,Query,UseGuards,NotFoundException,
 } from '@nestjs/common';
 import { TestJobApplicationService } from './testjobapplication.service';
 import { CreateTestJobApplicationDto } from './dto/createtestjobapplication.dto';

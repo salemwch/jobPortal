@@ -24,6 +24,7 @@ const register = (token,data,file) =>{
      };
 
 const getCompanyByID = (token,id)=>{
+        console.log("Making request for company ID:", id);
     return HTTP.get(`/company/${id}`,{
         headers: {
             Authorization: `Bearer ${token}`

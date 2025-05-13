@@ -18,7 +18,7 @@ export class CreateJobApplicationDto {
   @IsNotEmpty()
   jobOffer: string;
   @IsMongoId()
-  @IsNotEmpty()
+  @IsOptional()
   testJobApplication: string;
   @IsOptional()
   @IsEnum(ApplicationStatus)

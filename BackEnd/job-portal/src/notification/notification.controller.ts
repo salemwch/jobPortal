@@ -11,8 +11,6 @@ import {
 } from '@nestjs/common';
 import { NotificationService } from './notification.service';
 import { CreateNotificationDto } from './dto/create-notification.dto';
-import { UpdateNotificationDto } from './dto/update-notification.dto';
-import { response } from 'express';
 
 @Controller('notification')
 export class NotificationController {
@@ -60,7 +58,7 @@ export class NotificationController {
   @Patch(':id/read')
   async markAsRead(@Res() response, @Param('id') id: string) {
     try {
-      const markRead = await this.notificationService.marAsRead(id);
+      const markRead = await this.notificationService.markAsRead(id);
       return response.status(HttpStatus.CREATED).json({
         message: 'notification marked as read',
         markRead,
@@ -74,7 +72,7 @@ export class NotificationController {
       });
     }
   }
-  @Delete('id')
+  @Delete(':id')
   async delete(@Res() response, @Param('id') id: string) {
     try {
       const deleteed = await this.notificationService.delete(id);

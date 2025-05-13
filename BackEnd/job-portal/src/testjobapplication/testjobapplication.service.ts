@@ -115,4 +115,17 @@ export class TestJobApplicationService {
     const correctAnswer = question.questions[0].correctAnswer;
     return correctAnswer === answer;
   }
+  async findOneTestByJobOfferId(jobOfferId: string): Promise<IJobTest> {
+    const test = await this.TestJobApplicationModel.findOne({
+      jobOffer: new Types.ObjectId(jobOfferId),
+    });
+
+    if (!test) {
+      throw new NotFoundException(
+        `No test found for job offer id ${jobOfferId}`
+      );
+    }
+
+    return test;
+  }
 }

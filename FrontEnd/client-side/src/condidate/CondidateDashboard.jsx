@@ -4,17 +4,20 @@ import Footer from "../componenets/Footer";
 import {useNavigate} from 'react-router-dom'
 import Header from "../componenets/header";
 
+
 const CondidateDashboard = () => {
   
   const [jobOffers, setJobOffers] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate()
-  const token = localStorage.getItem('token') ? JSON.parse(localStorage.getItem("user")).tokens.refreshToken
+  const token = sessionStorage.getItem('token') ? JSON.parse(sessionStorage.getItem("user")).tokens.refreshToken
   : null;
   useEffect(() =>{
     
     fetchJobOffers();
   },[]);
+ 
+  
   const fetchJobOffers = async () =>{
     try{
       const response = await jobOfferService.getAllJobOffers(token);
@@ -81,7 +84,7 @@ const CondidateDashboard = () => {
         </div>
         <div className="col-sm-12 col-md-4 d-flex flex-column align-items-start align-items-md-end justify-content-center">
           <div className="d-flex mb-3">
-            <a className="btn btn-light btn-square me-3" href="#">
+            <a className="btn btn-light btn-square me-3" href="/">
               <i className="far fa-heart text-primary" />
             </a>
             <button
@@ -103,7 +106,7 @@ const CondidateDashboard = () => {
     </div>
   ))}
 
-  <a className="btn btn-primary py-3 px-5" href="#">
+  <a className="btn btn-primary py-3 px-5" href="/">
     Browse More Jobs
   </a>
 </div>
@@ -115,8 +118,6 @@ const CondidateDashboard = () => {
   {/* Jobs End */}
   {/* Footer Start */}
   <Footer/>
-  {/* Back to Top */}
-  <a href="#" className="btn btn-lg btn-primary btn-lg-square back-to-top"  style={{width: '5%' }}><i className="bi bi-arrow-up" /></a>
 </div>
 
 

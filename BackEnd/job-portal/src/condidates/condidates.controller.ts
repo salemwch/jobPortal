@@ -11,23 +11,17 @@ import {
   Put,
   UseInterceptors,
   UploadedFile,
-  UseGuards,
   NotFoundException,
-  Query,
+  BadRequestException,
+  UseGuards,
 } from '@nestjs/common';
 import { CondidatesService } from './condidates.service';
 import { CreateCondidateDto } from './dto/create-condidate.dto';
 import { UpdateCondidateDto } from './dto/update-condidate.dto';
 import { diskStorage } from 'multer';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { AccesTokenGuards } from '../guards/accesToken.guards';
-import { RoleGuard } from '../guards/role.guard';
-import { UserRole } from '../userRole/userRole';
-import { Role } from '../guards/role.decorator';
-import { AuthGuard } from '@nestjs/passport';
+import { Types } from 'mongoose';
 import { RefreshTokenGuards } from 'src/guards/refreshToken.guards';
-import { response } from 'express';
-import { isValidObjectId } from 'mongoose';
 
 @Controller('condidates')
 export class CondidatesController {
@@ -98,13 +92,16 @@ export class CondidatesController {
     if (!getCondidateById) {
       throw new NotFoundException(`Condidate with id ${id} not found`);
     }
+    if (!Types.ObjectId.isValid(id)) {
+      throw new BadRequestException('invalid condidate Id');
+    }
     return response.status(HttpStatus.OK).json({
       message: 'Condidate fetched successfully',
       getCondidateById,
       statusCode: 200,
     });
   }
-
+  @UseGuards(RefreshTokenGuards)
   @Put(':id')
   @UseInterceptors(
     FileInterceptor('file', {
@@ -122,7 +119,7 @@ export class CondidatesController {
     @UploadedFile() file
   ) {
     try {
-      if (file && file.name) {
+      if (file && file.filename) {
         updateData.image = file?.filename;
       }
       const updateCondidate = await this.condidatesService.updateProfile(
@@ -216,18 +213,24 @@ export class CondidatesController {
   }
 
   @Patch(':id/viewCount')
-  async incrementViewCount(@Res() response, @Param('id') id: string) {
+  async incrementViewCount(
+    @Res() response,
+    @Param('id') profileId: string,
+    @Body('viewerId') viewerId: string
+  ) {
     try {
-      const updatedCondidate =
-        await this.condidatesService.incrementViewCount(id);
+      const updatedCondidate = await this.condidatesService.incrementViewCount(
+        profileId,
+        viewerId
+      );
       return response.status(HttpStatus.OK).json({
-        message: 'view count incremented syccessfully',
+        message: 'View count updated successfully',
         updatedCondidate,
         statusCode: 200,
       });
     } catch (error) {
       return response.status(HttpStatus.BAD_REQUEST).json({
-        message: 'error increment view count',
+        message: 'Error updating view count',
         error: (error as Error).message,
         statusCode: 400,
       });

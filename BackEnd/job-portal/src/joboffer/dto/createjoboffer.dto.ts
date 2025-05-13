@@ -19,4 +19,6 @@ export class CreateJobOfferDto {
   @IsString()
   @IsNotEmpty()
   salary: string;
+  @IsString()
+  requiredSkills: string[];
 }

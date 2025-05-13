@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import Statistic from '../pages/Statistic';
+import RoleBasedStatistics from '../RoleBasedStatistic/RoleStatistics';
 
 const Layout = () => {  
   return (
@@ -14,8 +15,6 @@ const Layout = () => {
       <div className="site-mobile-menu-body" />
     </div> {/* .site-mobile-menu */}
     {/* HOME */}
-    
-    <Statistic/>
     <section className="py-5 bg-image overlay-primary fixed overlay" style={{backgroundImage: 'url("images/hero_1.jpg")'}}>
       <div className="container">
         <div className="row align-items-center">
@@ -29,6 +28,7 @@ const Layout = () => {
         </div>
       </div>
     </section>
+    <RoleBasedStatistics/>
     <section className="site-section py-4">
       <div className="container">
         <div className="row align-items-center">

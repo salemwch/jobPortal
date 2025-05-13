@@ -1,8 +1,4 @@
-import {
-  BadGatewayException,
-  BadRequestException,
-  Injectable,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateCondidateDto } from './dto/create-condidate.dto';
 import { UpdateCondidateDto } from './dto/update-condidate.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -12,7 +8,6 @@ import * as argon2 from 'argon2';
 import { UserRole } from '../userRole/userRole';
 import { IUser } from '../user/Interface/IUser';
 import { IJobTest } from '../testjobapplication/interface/interfacetest';
-
 @Injectable()
 export class CondidatesService {
   constructor(
@@ -67,21 +62,34 @@ export class CondidatesService {
     id: string,
     updateData: UpdateCondidateDto
   ): Promise<ICondidate> {
-    if (updateData.password) {
-      updateData.password = await argon2.hash(updateData.password);
+    const data = { ...updateData } as any;
+    // Hash password if exists
+    if (data.password) {
+      data.password = await argon2.hash(data.password);
     }
-    const update = await this.condidateModel
-      .findByIdAndUpdate(
-        id,
-        { $set: updateData },
-        { new: true, runValidators: true }
-      )
-      .lean();
-    if (!update) {
-      throw new BadRequestException(`condidate with Id ${id} not found`);
+    // Remove forbidden fields
+    delete data.jobApplications;
+    delete data.testJobApplication;
+    try {
+      const updated = await this.condidateModel
+        .findByIdAndUpdate(
+          id,
+          { $set: data },
+          { new: true, runValidators: true }
+        )
+        .lean();
+      if (!updated) {
+        throw new BadRequestException(`Condidate with ID ${id} not found`);
+      }
+      return updated;
+    } catch (error: any) {
+      if (error.code === 11000 && error.keyPattern?.email) {
+        throw new BadRequestException('This email is already in use.');
+      }
+      throw new BadRequestException('Profile update failed.');
     }
-    return update;
   }
+
   async deleteCondidate(id: string): Promise<ICondidate> {
     const condidate = await this.condidateModel.findByIdAndDelete(id);
     if (!condidate) {
@@ -128,16 +136,23 @@ export class CondidatesService {
     }
     return condidate;
   }
-  async incrementViewCount(id: string): Promise<ICondidate> {
-    const condidate = await this.condidateModel.findById(id);
-    if (!condidate) {
-      throw new BadRequestException(`condidate with id ${id} not found`);
+  async incrementViewCount(profileId: string, viewerId: string) {
+    const profile = await this.condidateModel.findById(profileId);
+    if (!profile) {
+      throw new Error('Condidate profile not found');
     }
-    return this.condidateModel.findByIdAndUpdate(
-      id,
-      { $inc: { viewCount: 1 } },
-      { new: true }
-    );
+    // Avoid self-view
+    if (profile._id.toString() === viewerId) {
+      return profile; // Don't count self-views
+    }
+    profile.viewers = profile.viewers || [];
+    if (profile.viewers.includes(viewerId)) {
+      return profile; // Already counted
+    }
+    // ✅ Push viewerId and increment viewCount
+    profile.viewers.push(viewerId);
+    profile.viewCount += 1;
+    return await profile.save();
   }
   async findMostViwed(): Promise<ICondidate | null> {
     return this.condidateModel.findOne().sort({ viewCount: -1 }).exec();

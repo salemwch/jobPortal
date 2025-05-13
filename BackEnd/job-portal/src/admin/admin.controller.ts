@@ -13,6 +13,7 @@ import {
   Put,
   UseGuards,
   NotFoundException,
+  BadRequestException,
 } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { CreateAdminDto } from './dto/create-admin.dto';
@@ -22,11 +23,9 @@ import { diskStorage } from 'multer';
 import { AccesTokenGuards } from 'src/guards/accesToken.guards';
 import { RoleGuard } from 'src/guards/role.guard';
 import { Role } from 'src/guards/role.decorator';
-import { User } from 'src/user/entities/user.entity';
 import { UserRole } from 'src/userRole/userRole';
-import { response } from 'express';
-import { error } from 'console';
 import { UserService } from 'src/user/user.service';
+import { Types } from 'mongoose';
 
 @Controller('admin')
 export class AdminController {
@@ -72,6 +71,9 @@ export class AdminController {
     const admin = await this.adminService.findAdminById(id);
     if (!admin) {
       throw new NotFoundException(`Admin with ID ${id} not found`);
+    }
+    if (!Types.ObjectId.isValid(id)) {
+      throw new BadRequestException('Invalid admin ID');
     }
     return admin;
   }

@@ -7,7 +7,7 @@ const Login = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    localStorage.removeItem('user');
+    sessionStorage.removeItem('user');
   }, []);
 
   const changeHandler = (e) => {
@@ -27,11 +27,11 @@ const Login = () => {
       .then((res) => {
         const user = res.data?.user;
         const role = user?.role;
-        localStorage.setItem('user', JSON.stringify(res.data));
+        sessionStorage.setItem('user', JSON.stringify(res.data));
         if(role === 'condidate'){
           navigate('/condidateDashboard');
         }else if(role === 'company'){
-          navigate('/companyDashboard');
+          navigate('/DashboardCompanie');
         }else if(role ==='admin'){
           alert('only condidate and company can log here ');
         }
@@ -106,7 +106,7 @@ const Login = () => {
                 </div>
 
                 <div className="text-center mt-3">
-                  <Link to="/auth/forgetpassword" className="text-primary fw-bold">
+                  <Link to="/ForgetPassword" className="text-primary fw-bold">
                     Forgot Password?
                   </Link>
                 </div>

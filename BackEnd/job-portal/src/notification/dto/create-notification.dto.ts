@@ -1,5 +1,4 @@
 import { IsMongoId, IsNotEmpty, IsOptional, IsString } from 'class-validator';
-import { ICompany } from 'src/company/Interface/Interface';
 
 export class CreateNotificationDto {
   @IsString()
@@ -7,8 +6,11 @@ export class CreateNotificationDto {
   message: string;
   @IsMongoId()
   @IsNotEmpty()
-  user: string | ICompany;
+  user: string;
   @IsOptional()
   @IsString()
   type?: string;
+  @IsMongoId()
+  @IsNotEmpty()
+  jobOffer: string;
 }

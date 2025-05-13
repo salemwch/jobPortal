@@ -7,7 +7,6 @@ import {
   Delete,
   Get,
   UseGuards,
-  Req,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { resetdto } from './dto/reset.dto';

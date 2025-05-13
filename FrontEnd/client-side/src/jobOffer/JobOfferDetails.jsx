@@ -10,40 +10,53 @@ import Footer from "../componenets/Footer";
 import { Modal, Button } from "react-bootstrap";
 
 const JobOfferDetails = () => {
+  //Hey React! Listen to the URL — grab whatever comes after /something/:id and give it to me as id. I’ll use that to know which job offer I’m dealing with
   const { id } = useParams();
+  //React, remember this: I’m holding the job offer data here. Start with nothing. When I get real data from the backend, I’ll call setJobOffer(data) to fill it in — and you, React, will re-render everything that depends on it
   const [jobOffer, setJobOffer] = useState(null);
+  //Hey React, I want to keep track of two things: a list of comments and whatever the user is typing into a new comment input. Start both as empty."
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
+  //React, this is a signal for when a post request is happening. If I ever say true, it means something’s being sent to the server. Use it to disable the button and show a spinner 
   const [posting, setPosting] = useState(false);
+  //React, this one is my ‘loading spinner switch.’ It starts true — as in, I’m loading data. Once I’m done fetching, I’ll flip it off with setLoading(false). Then you’ll show the actual content and hide the spinner
   const [loading, setLoading] = useState(true);
+  //React, keep track of whether I’m showing a popup modal or not. It’s closed for now. If something happens (like clicking a button), I’ll tell you to show it with setShowModal(true) 
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
+    //I’m defining a helper function. This will talk to the backend and get me what I need: the job offer and its comments.
     const fetchJobOffer = async () => {
-      const token = localStorage.getItem("user");
-
+      //Hey browser, open your session storage and give me the saved ‘user’ object. I need it because it contains the token to prove who the user is
+      const token = sessionStorage.getItem("user");
+      //If there’s no token, stop everything! This user is not logged in or the session is broken. Log an error and don’t try to fetch protected data
       if (!token) {
         console.error("No authentication token found");
         return;
       }
 
       try {
+        //Hey server! Here’s my token and job ID — send me the job offer that matches.
         const response = await jobOfferService.getDataById(token, id);
+        //“If the server replies with proper data, React, store that job offer inside my jobOffer state. That will automatically update anything on the page that depends on it. If not, log an error and set jobOffer to null”
         if (response.data && response.data.getDataId) {
           setJobOffer(response.data.getDataId);
         } else {
           console.error("Invalid job offer data received", response.data);
           setJobOffer(null);
         }
-
+        //Hey server again! Now give me all the comments tied to this job offer. Use the same token and ID.”
         const commentResponse = await commentService.getCommentsByJobOffer(token, id);
+        //“If the server replies with comments, React — store them. That will update the comment section automatically. If not, log a warning
         if (commentResponse.data) {
           setComments(commentResponse.data);
         } else {
           console.error("No comments found");
         }
-      } catch (error) {
+      }
+      //If anything in the fetch process breaks, catch the error and clean up. No job offer, no comments — avoid showing half-loaded U
+      catch (error) {
         console.error("Error fetching job offer:", error);
         setJobOffer(null);
         setComments([]);
@@ -55,16 +68,18 @@ const JobOfferDetails = () => {
     fetchJobOffer();
   }, [id]);
 
+    //Go grab the current user's data from session storage — we’ll need their token to ask the backend for comments.
   const refreshComments = async () => {
-    const token = localStorage.getItem("user");
-
+    const token = sessionStorage.getItem("user");
+    //"If there’s no token, stop here. We can’t ask for comments if we don’t know who the user is."
     if (!token) {
       console.error("No authentication token found");
       return;
     }
-
+    //Hey commentService, go get me all the comments for this job offer — here’s the token so you know I’m allowed to ask.
     try {
       const response = await commentService.getCommentsByJobOffer(token, id);
+      //"If the response has a data property, set comments to that property. If not, log an error and set comments to an empty array."
       if (response.data) {
         setComments(response.data);
       } else {
@@ -103,12 +118,11 @@ const JobOfferDetails = () => {
             <div className="col-md-8">
               <div className="job-details">
                 <h3>{jobOffer.title}</h3>
-                <p><strong>testJobApplication:</strong> {jobOffer.testJobApplication}</p>
-                <p><strong>jobOffer ID:</strong> {jobOffer._id}</p>
+                <p><strong>jobOffer Title:</strong> {jobOffer.title}</p>
                 <p><strong>Description:</strong> {jobOffer.description}</p>
                 <p><strong>Location:</strong> {jobOffer.location}</p>
                 <p><strong>Salary:</strong> {jobOffer.salary || "N/A"}</p>
-                <p><strong>Company ID:</strong> {jobOffer.company?._id}</p>
+                <p><strong>Company name:</strong> {jobOffer.company?.name}</p>
                 <p><strong>Posted on:</strong> {new Date(jobOffer.createdAt).toLocaleDateString()}</p>
                 <p><strong>Status:</strong>
                   <span
@@ -122,6 +136,7 @@ const JobOfferDetails = () => {
             <button
               className="btn btn-primary mt-3"
               onClick={() => {
+                //React! Here’s a blue button that says ‘Apply Now’. When clicked, If a test is required → instantly navigate to the /apply/:id page , If no test is needed → show the modal popup to notify the user.   
                 if (jobOffer.testJobApplication) {
                   navigate(`/apply/${jobOffer._id}`);
                 } else {
@@ -162,10 +177,11 @@ const JobOfferDetails = () => {
 
           <div className="comments-section mt-4">
             <h5>Comments</h5>
+            {/*If there are any comments in the list, show them. Otherwise, say there's nothing yet.*/}
             {comments.length > 0 ? (
+              /* "Go through every comment and show it in its own styled card. Use index as a key (for now — ideally, you'd use comment._id). */
               comments.map((comment, index) => (
                 <div key={index} className="comment-card">
-                  <p><strong>Condidate:</strong> {comment.condidate ? comment.condidate._id : "Unknown"}</p>
                   <p><strong>Condidate:</strong> {comment.condidate ? comment.condidate.name : "unknown"}</p>
                   <p><strong>Content:</strong> {comment.content}</p>
                   <p><strong>Status:</strong>
@@ -173,8 +189,9 @@ const JobOfferDetails = () => {
                       {comment.status}
                     </span>
                   </p>
+                  {/* Convert the createdAt timestamp to a human-readable date and time */}
                   <p><strong>Created At:</strong> {new Date(comment.createdAt).toLocaleString()}</p>
-
+                {/* "If the company has responded and it's an object, show their reply inside a styled box. */}
                   {comment.companyResponse && typeof comment.companyResponse === "object" ? (
                     <div className="mt-2 p-2 bg-light border">
                       <p><strong>Company Response:</strong> {comment.companyResponse.message || "No message available"}</p>
@@ -183,10 +200,11 @@ const JobOfferDetails = () => {
                   ) : (
                     <p className="text-muted">No response from company yet.</p>
                   )}
-
+                  {/* Check if the condidate responded (as an array of replies). If yes, list them out in a separate box. */}
                   {Array.isArray(comment.condidateResponse) && comment.condidateResponse.length > 0 ? (
                     <div className="mt-2 p-2 bg-light border">
                       <strong>Condidate Responses:</strong>
+                      {/* For every reply from the condidate, show it inside a white box with padding and rounded borders. */}
                       {comment.condidateResponse.map((response, i) => (
                         <div key={i} className="border rounded p-2 mt-1 bg-white">
                           <p><strong>Message:</strong> {response.message}</p>
@@ -197,7 +215,7 @@ const JobOfferDetails = () => {
                   ) : (
                     <p className="text-muted">No response from condidate yet.</p>
                   )}
-
+                  {/* If the company has responded, show a form where the condidate can reply. When a response is sent, refresh the comments." */}
                   {comment.companyResponse && (
                     <CondidateReplyForm commentId={comment._id} onResponseSent={refreshComments} />
                   )}
@@ -210,6 +228,7 @@ const JobOfferDetails = () => {
 
           <div className="add-comment-form mt-4">
             <h5>Add a Comment</h5>
+            {/* Hey browser, if the user writes in this box, store it in newComment*/}
             <textarea
               className="form-control"
               rows="3"
@@ -218,16 +237,18 @@ const JobOfferDetails = () => {
               onChange={(e) => setNewComment(e.target.value)}
             />
             <button
-              className="btn btn-primary mt-2"
-              onClick={async () => {
+              className="btn btn-primary mt-2" 
+              //When the button is clicked, run this async function
+              onClick={async () => { 
+                //If the user didn’t write anything useful (just spaces), stop right away
                 if (!newComment.trim()) return;
-
-                const userData = localStorage.getItem("user");
+                //First, get the user from session storage. If we don’t find anything, show an alert and stop.
+                const userData = sessionStorage.getItem("user");
                 if (!userData) {
                   alert("You must be logged in to comment.");
                   return;
                 }
-
+                //Try to parse the user data and grab the refresh token and condidate ID. If it’s broken, show an error and stop."
                 let token = null;
                 let condidateId = null;
                 try {
@@ -235,10 +256,10 @@ const JobOfferDetails = () => {
                   token = parsed.tokens?.refreshToken;
                   condidateId = parsed.user?._id;
                 } catch (err) {
-                  console.error("Invalid user data in localStorage.");
+                  console.error("Invalid user data in sessionStorage.");
                   return;
                 }
-
+                //Set posting to true so we can show a loading state. Then send the comment using the service, passing token and required data.
                 setPosting(true);
                 try {
                   const res = await commentService.createComment(token, {
@@ -246,18 +267,21 @@ const JobOfferDetails = () => {
                     condidate: condidateId,
                     content: newComment,
                   });
-
+                  //If the backend sends back the new comment Add it to the comment list , Clear the text box and refresh the comments list 
                   if (res.data) {
                     setComments([...comments, res.data]);
-                    setNewComment("");
+                    setNewComment(""); 
                     refreshComments();
                   }
-                } catch (err) {
+                }
+                //If something goes wrong, log it. Then always (whether it worked or failed), mark posting as false to reset the button state
+                catch (err) {
                   console.error("Failed to post comment", err);
                 } finally {
                   setPosting(false);
                 }
               }}
+              //Disable the button while posting to prevent double submissions. Show a spinner message.
               disabled={posting}
             >
               {posting ? "Posting..." : "Post Comment"}

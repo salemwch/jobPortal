@@ -1,12 +1,6 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { Type } from 'class-transformer';
-import {
-  IsEmail,
-  IsNumber,
-  IsOptional,
-  IsPhoneNumber,
-  IsString,
-} from 'class-validator';
+import { IsEmail, IsNumber, IsOptional, IsString } from 'class-validator';
 import { CreateCondidateDto } from './create-condidate.dto';
 
 export class UpdateCondidateDto extends PartialType(CreateCondidateDto) {
@@ -23,7 +17,7 @@ export class UpdateCondidateDto extends PartialType(CreateCondidateDto) {
 
   @IsOptional()
   @IsString()
-  skills?: string;
+  skills?: string[];
 
   @IsOptional()
   @IsString()

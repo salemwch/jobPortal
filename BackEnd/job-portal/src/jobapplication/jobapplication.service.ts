@@ -7,7 +7,7 @@ import {
 import { CreateJobApplicationDto } from './dto/create-job-application.dto';
 import { UpdateJobApplicationDto } from './dto/update-job-application.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { model, Model, Types } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { IJobApplication } from './interface/interfaceJobApplication';
 import { TestJobApplicationService } from 'src/testjobapplication/testjobapplication.service';
 import { ApplicationStatus } from './enumApplication';
@@ -15,11 +15,9 @@ import { IUser } from 'src/user/Interface/IUser';
 import { IJobOffer } from 'src/joboffer/interface/InterfaceJobOffer';
 import { ICondidate } from 'src/condidates/Interface/interface';
 import { IJobTest } from 'src/testjobapplication/interface/interfacetest';
-import { application } from 'express';
 import { NotificationService } from 'src/notification/notification.service';
 import { MailService } from 'src/mailtrap/mailservice';
 import { Company } from 'src/company/entities/company.entity';
-import { ICompany } from 'src/company/Interface/Interface';
 type PopulatedJobOffer = IJobOffer & { company: Company };
 
 @Injectable()
@@ -51,41 +49,14 @@ export class JobApplicationService {
     const existingApplication = await this.jobApplicationModel.findOne({
       condidate: new Types.ObjectId(createJobApplication.condidate),
       jobOffer: new Types.ObjectId(createJobApplication.jobOffer),
-      testJobApplication: new Types.ObjectId(
-        createJobApplication.testJobApplication
-      ),
     });
     if (existingApplication) {
       throw new BadRequestException(
         'This condidate has already applied for this job'
       );
     }
-
-    const jobTest = await this.testJobApplicationService.findOnetest(
-      createJobApplication.testJobApplication
-    );
-    if (!jobTest) {
-      throw new NotFoundException('No tests found for this job offer');
-    }
-    if (jobTest.questions.length === 0) {
-      throw new BadRequestException('Test has no questions');
-    }
-    const jobOfferId = new Types.ObjectId(createJobApplication.jobOffer);
-    if (!jobTest.jobOffer.equals(jobOfferId)) {
-      throw new BadRequestException(
-        'TestJobApplication does not belong to the specified job offer'
-      );
-    }
-
-    const testResults = jobTest.questions.map(question => ({
-      questionId: question._id.toString(),
-      answer: null,
-      isCorrect: null,
-    }));
-
     const newJobApplication = new this.jobApplicationModel({
       ...createJobApplication,
-      testResults,
       score: 0,
       status: ApplicationStatus.Pending,
       name: createJobApplication.name,
@@ -108,32 +79,25 @@ export class JobApplicationService {
       { new: true }
     );
 
-    function isObjectId(obj: any): obj is Types.ObjectId {
-      return obj instanceof Types.ObjectId;
-    }
-    const jobOffer = await this.jobOfferModel
-      .findById(createJobApplication.jobOffer)
-      .exec();
-    if (jobOffer) {
-      await this.notificationService.create({
-        message: `A new condidate has applied for your job offer: ${jobOffer.title}`,
-        user: isObjectId(jobOffer.company)
-          ? jobOffer.company.toString()
-          : jobOffer.company,
-        type: 'jobApplication',
-      });
-    }
-
     const jobOfferPopulated = (await this.jobOfferModel
       .findById(createJobApplication.jobOffer)
-      .populate('company', 'name email')
+      .populate('company', 'name email _id')
       .lean()
       .exec()) as unknown as PopulatedJobOffer;
 
     if (!jobOfferPopulated?.company?.email) {
       throw new Error('Company email not found');
     }
-
+    if (!jobOfferPopulated?.company?._id) {
+      throw new Error('Company ID not found for notification');
+    }
+    // ✅ Send a notification to the company about the new application
+    await this.notificationService.create({
+      user: jobOfferPopulated.company._id.toString(), // target company user
+      message: `${createJobApplication.name} has applied to your job offer "${jobOfferPopulated.title}".`,
+      jobOffer: jobOfferPopulated._id.toString(),
+      type: 'application', // optional, or use 'info'
+    });
     const companyEmail = jobOfferPopulated.company.email;
     await this.mailService.sendJobApplicationEmail({
       name: createJobApplication.name,

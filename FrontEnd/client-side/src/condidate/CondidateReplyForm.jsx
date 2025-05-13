@@ -7,7 +7,7 @@ const CondidateReplyForm = ({ commentId, onResponseSent }) => {
   const [showReplyForm, setShowReplyForm] = useState(false);
 
   const handleReply = async () => {
-    const storedUser = localStorage.getItem("user");
+    const storedUser = sessionStorage.getItem("user");
   
     if (!storedUser) {
       alert("You must be logged in.");

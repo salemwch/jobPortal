@@ -6,7 +6,6 @@ import {
   IsNumber,
   IsOptional,
   IsString,
-  MinLength,
 } from 'class-validator';
 import { CreateUserDto } from '../../user/dto/create-user.dto';
 import { UserRole } from '../../userRole/userRole';
@@ -38,10 +37,10 @@ export class CreateCondidateDto extends CreateUserDto {
   @IsNotEmpty()
   @IsOptional()
   workExperience?: string;
-  @IsString()
+  @IsArray()
   @IsNotEmpty()
   @IsOptional()
-  skills?: string;
+  skills?: string[];
   @IsString()
   @IsNotEmpty()
   @IsOptional()

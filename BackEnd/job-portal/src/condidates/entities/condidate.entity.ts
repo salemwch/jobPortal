@@ -1,7 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { IsEnum } from 'class-validator';
 import { Document, SchemaTypes, Types } from 'mongoose';
-import { User } from 'src/user/entities/user.entity';
 import { UserRole } from '../../userRole/userRole';
 
 @Schema()
@@ -19,7 +17,7 @@ export class Condidate extends Document {
   @Prop()
   workExperience?: string;
   @Prop()
-  skills?: string;
+  skills?: string[];
   @Prop()
   location?: string;
   @Prop()

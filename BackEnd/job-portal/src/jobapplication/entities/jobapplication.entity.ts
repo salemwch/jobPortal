@@ -26,9 +26,9 @@ export class JobApplication extends Document {
   @Prop({
     type: SchemaTypes.ObjectId,
     ref: 'TestJobApplication',
-    required: true,
+    required: false,
   })
-  testJobApplication: Types.ObjectId;
+  testJobApplication?: Types.ObjectId;
   @Prop({ default: 0 })
   score: number;
   @Prop({

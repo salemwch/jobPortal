@@ -11,7 +11,7 @@ export interface ICondidate extends Document {
   phone: number;
   education?: string;
   workExperience?: string;
-  skills?: string;
+  skills?: string[];
   resumeLink?: string;
   image?: string;
   role: UserRole;
@@ -21,4 +21,5 @@ export interface ICondidate extends Document {
   viewCount: number;
   status: string;
   createdAt: Date;
+  viewers: string[];
 }

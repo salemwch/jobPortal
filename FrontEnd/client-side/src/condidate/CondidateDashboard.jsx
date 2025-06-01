@@ -3,6 +3,7 @@ import jobOfferService from "../services/jobOffer";
 import Footer from "../componenets/Footer";
 import {useNavigate} from 'react-router-dom'
 import Header from "../componenets/header";
+import TidioLoader from '../Shared/TidioLoader';
 
 
 const CondidateDashboard = () => {
@@ -115,6 +116,7 @@ const CondidateDashboard = () => {
       </div>
     </div>
   </div>
+   <TidioLoader />
   {/* Jobs End */}
   {/* Footer Start */}
   <Footer/>

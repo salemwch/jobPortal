@@ -7,7 +7,6 @@ import { UserRole } from '../../userRole/userRole';
 export class Admin extends User {
   @Prop()
   image: string;
-  @IsEnum(UserRole, { message: 'invalid role' })
-  role: UserRole;
+  readonly role: UserRole;
 }
 export const adminSchema = SchemaFactory.createForClass(Admin);

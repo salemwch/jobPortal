@@ -1,19 +1,9 @@
-import React, { useEffect, useState } from 'react'
-import Statistic from '../pages/Statistic';
 import RoleBasedStatistics from '../RoleBasedStatistic/RoleStatistics';
 
 const Layout = () => {  
   return (
     <div>
   <div className="site-wrap">
-    <div className="site-mobile-menu site-navbar-target">
-      <div className="site-mobile-menu-header">
-        <div className="site-mobile-menu-close mt-3">
-          <span className="icon-close2 js-menu-toggle" />
-        </div>
-      </div>
-      <div className="site-mobile-menu-body" />
-    </div> {/* .site-mobile-menu */}
     {/* HOME */}
     <section className="py-5 bg-image overlay-primary fixed overlay" style={{backgroundImage: 'url("images/hero_1.jpg")'}}>
       <div className="container">
@@ -32,6 +22,7 @@ const Layout = () => {
     <section className="site-section py-4">
       <div className="container">
         <div className="row align-items-center">
+          
           <div className="col-12 text-center mt-4 mb-5">
             <div className="row justify-content-center">
               <div className="col-md-7">

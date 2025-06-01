@@ -12,15 +12,18 @@ const CondidateProfile = () => {
   const [condidate, setCondidate] = useState(null);
   const [loading, setLoading] = useState(true);
   const [editMode, setEditMode] = useState(false);
+  const [skillsInput, setSkillsInput] = useState('');
+
   const [selectedFile, setSelectedFile] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     phone: '',
-    skills: '',
+    skills: [],
     education: '',
     workExperience: '',
     location: '',
+    password:'',
   });
 
   const IMAGE_BASE_URL = "http://localhost:3000/uploads"; 
@@ -44,16 +47,17 @@ if (storedUser && storedUser.user) {
   storedUser.user.image = condidateData.image;
   sessionStorage.setItem("user", JSON.stringify(storedUser));
 }
-        setFormData(condidateData);
+        setFormData({ ...condidateData, password: "" });
       } catch (error) {
         console.error("Error fetching condidate:", error);
       } finally {
         setLoading(false);
       }
     };
-  
+    
+
     fetchCondidate();
-  }, [id]);
+  }, [ id]);
   
 
   const handleUpdateProfile = async (e) => {
@@ -63,8 +67,13 @@ if (storedUser && storedUser.user) {
         ? JSON.parse(sessionStorage.getItem("user")).refreshToken
         : null;
   
+      
       const updatedData = { ...formData };
-  
+
+if (!formData.password) {
+  delete updatedData.password;
+}
+
       const response = await condidateService.updateProfile(token, id, updatedData, selectedFile);
     
       setCondidate(response.data.updateCondidate);  
@@ -128,9 +137,18 @@ window.dispatchEvent(new Event("userUpdated"));
     }
   };
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+  const { name, value } = e.target;
+  
+  if (name === "skills") {
+    setSkillsInput(value);
+    const skillsArray = value.split(',')
+                            .map(skill => skill.trim())
+                            .filter(skill => skill );
+    setFormData(prev => ({ ...prev, [name]: skillsArray }));
+  } else {
+    setFormData(prev => ({ ...prev, [name]: value }));
+  }
+};
 
   return (
     <div>
@@ -191,15 +209,15 @@ window.dispatchEvent(new Event("userUpdated"));
                 />
               </div>
               <div className="mb-3">
-                <label className="form-label">Skills:</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  name="skills"
-                  value={formData.skills}
-                  onChange={handleChange}
-                />
-              </div>
+  <label className="form-label">Skills (comma separated):</label>
+  <input
+    type="text"
+    className="form-control"
+    name="skills"
+    value={skillsInput} 
+    onChange={handleChange}
+  />
+</div>
               <div className="mb-3">
                 <label className="form-label">Education:</label>
                 <input
@@ -231,6 +249,16 @@ window.dispatchEvent(new Event("userUpdated"));
                 />
               </div>
               <div className="mb-3">
+  <label className="form-label">Password (optional):</label>
+  <input
+    type="password"
+    className="form-control"
+    name="password"
+    value={formData.password}
+    onChange={handleChange}
+  />
+</div>
+              <div className="mb-3">
       <label className="form-label">Profile Picture (optional):</label>
       <input
         type="file"
@@ -252,7 +280,10 @@ window.dispatchEvent(new Event("userUpdated"));
               <p><strong>Email:</strong> {condidate.email}</p>
               <p><strong>Phone:</strong> {condidate.phone || "N/A"}</p>
               <p><strong>Status:</strong> {condidate.status}</p>
-              <p><strong>Skills:</strong> {condidate.skills || "No skills listed"}</p>
+              <p><strong>Location:</strong> {condidate.location}</p>
+              <p><strong>Work Experience:</strong> {condidate.workExperience}</p>
+              <p><strong>Skills:</strong> {condidate.skills?.join(' ') || "No skills listed"}</p>
+              <p><strong>Description:</strong> {condidate.description || "No description yet"}</p>
               <p><strong>Job Applications:</strong> {condidate.jobApplications?.length || 0}</p>
               <p><strong>Test JobApplication:</strong> {condidate.testJobApplication?.length || 0}</p>
               <p><strong>Views:</strong> {condidate.viewCount}</p>

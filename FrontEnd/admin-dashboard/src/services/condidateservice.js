@@ -25,9 +25,8 @@ const getAllCondidates = (token) => {
         }
     });
 };
-const getCondidateById = (token,id) =>{
-    console.log("Making request for candidate ID:", id); 
-    return HTTP.get(`/condidates/${id}`,{
+const getCondidateById = (token, id) => {
+    return HTTP.get(`/condidates/by-id/${id}`, {
         headers: {
             Authorization: `Bearer ${token}`
         }

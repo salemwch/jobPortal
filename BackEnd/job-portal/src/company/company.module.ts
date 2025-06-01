@@ -5,9 +5,8 @@ import { UserModule } from '../user/user.module';
 import { TestJobApplicationModule } from 'src/testjobapplication/testjobapplication.module';
 import { JobOfferModule } from 'src/joboffer/joboffer.module';
 import { MailModule } from 'src/mailtrap/mailmodule';
-import { MongooseModule } from '@nestjs/mongoose';
-import { UserSchema } from 'src/user/entities/user.entity';
-import { CopmanySchema } from './entities/company.entity';
+
+import { JobApplicationModule } from 'src/jobapplication/jobapplication.module';
 
 @Module({
   imports: [
@@ -15,6 +14,7 @@ import { CopmanySchema } from './entities/company.entity';
     forwardRef(() => TestJobApplicationModule),
     forwardRef(() => MailModule),
     forwardRef(() => JobOfferModule),
+    forwardRef(() => JobApplicationModule),
   ],
   controllers: [CompanyController],
   providers: [CompanyService],

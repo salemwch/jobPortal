@@ -515,7 +515,7 @@ body {
 }
 .mx-auto.site-navigation{
   flex-shrink: 0;
-  width: 50%;
+  width: 62%;
   max-width: 100%;
   padding-right: calc(var(--bs-gutter-x) * .5);
   padding-left: calc(var(--bs-gutter-x) * .5);
@@ -523,4 +523,10 @@ body {
 
 }
 
+
+
+
+.site-menu {
+  margin: 0 auto;
+}
 

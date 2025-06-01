@@ -82,7 +82,6 @@ const CompanyCommentsDashboard = () => {
               <p style={{ color: "gray", marginTop: "10px" }}>No response from condidate yet.</p>
             )}
 
-            {/* 👉 Action buttons */}
             {/* Button to delete candidate-originated comment */}
             {comment.content && comment.condidate?.name && comment.status && (
               <button

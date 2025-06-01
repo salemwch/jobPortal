@@ -1,7 +1,7 @@
-import { useState } from "react";
-import comment from "../services/comment";
+import React, { useState } from "react";
+import commentService from "../services/commentService";
 
-const CondidateReplyForm = ({ commentId, onResponseSent }) => {
+const CondidateReplyForm =  React.memo(({ commentId, onResponseSent }) => {
   const [reply, setReply] = useState("");
   const [posting, setPosting] = useState(false);
   const [showReplyForm, setShowReplyForm] = useState(false);
@@ -27,7 +27,7 @@ const CondidateReplyForm = ({ commentId, onResponseSent }) => {
   
     try {
       setPosting(true);
-      await comment.respondToComment(
+      await commentService.respondToComment(
         token,
         commentId,
         user._id,
@@ -79,6 +79,6 @@ const CondidateReplyForm = ({ commentId, onResponseSent }) => {
       )}
     </div>
   );
-};
+});
 
 export default CondidateReplyForm;

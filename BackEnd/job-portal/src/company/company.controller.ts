@@ -11,16 +11,15 @@ import {
   UploadedFile,
   UseInterceptors,
   Put,
-  Req,
-  UseGuards,
-  BadRequestException,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { CompanyService } from './company.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { UpdateCompanyDto } from './dto/update-company.dto';
+import { RefreshTokenGuards } from 'src/guards/refreshToken.guards';
 @Controller('company')
 export class CompanyController {
   constructor(private readonly companyService: CompanyService) {}
@@ -91,20 +90,26 @@ export class CompanyController {
   async getCompanyBYID(@Res() response, @Param('id') id: string) {
     try {
       const getCompanybyID = await this.companyService.getCompanyById(id);
+      if (!getCompanybyID) {
+        return response.status(HttpStatus.NOT_FOUND).json({
+          message: 'Company not Found',
+          statusCode: 404,
+        });
+      }
       return response.status(HttpStatus.OK).json({
         message: 'company fetched  by ID',
         getCompanybyID,
-        statusCode: 201,
+        statusCode: 200,
       });
     } catch (error) {
-      return response.status(HttpStatus.NOT_FOUND).json({
+      return response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         message: 'fetching company by id failed',
         error: (error as Error).message,
-        statusCode: 404,
+        statusCode: 500,
       });
     }
   }
-
+  @UseGuards(RefreshTokenGuards)
   @Put(':id')
   @UseInterceptors(
     FileInterceptor('file', {
@@ -123,27 +128,28 @@ export class CompanyController {
   ) {
     try {
       if (file && file.filename) {
-        updateCompanyDto.image = file.filename;
+        updateCompanyDto.image = file?.filename;
       }
       const updatedCompany = await this.companyService.updateCompany(
         id,
         updateCompanyDto
       );
+
       if (!updatedCompany) {
         return response.status(HttpStatus.NOT_FOUND).json({
-          message: 'company not found ',
-          statusCode: 400,
+          message: 'company not found',
+          statusCode: 404,
         });
       }
-      return response.status(HttpStatus.ACCEPTED).json({
-        message: 'company updated successfully',
+      return response.status(HttpStatus.CREATED).json({
+        message: 'Company updated successfully',
         updatedCompany,
-        statusCode: 200,
+        statusCode: 202,
       });
     } catch (error) {
       return response.status(HttpStatus.BAD_REQUEST).json({
-        message: 'company updated failed',
-        error: (error as Error).message,
+        message: 'Company update failed',
+        error: (error as Error).stack,
         statusCode: 400,
       });
     }
@@ -215,5 +221,9 @@ export class CompanyController {
         statusCode: 400,
       });
     }
+  }
+  @Get(':id/dashboard-stats')
+  getCompanyDashboardStats(@Param('id') id: string) {
+    return this.companyService.getCompanyDashboardStats(id);
   }
 }

@@ -8,12 +8,13 @@ import { CompanyModule } from 'src/company/company.module';
 import { JobApplicationModule } from 'src/jobapplication/jobapplication.module';
 import { TestJobApplicationModule } from 'src/testjobapplication/testjobapplication.module';
 import { MailModule } from 'src/mailtrap/mailmodule';
+console.log('MailModule:', MailModule);
 import { NotificationModule } from 'src/notification/notification.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: 'JobOffer', schema: JobOfferSchema }]),
-    UserModule,
+    forwardRef(() => UserModule),
     forwardRef(() => JobApplicationModule),
     forwardRef(() => TestJobApplicationModule),
     MailModule,

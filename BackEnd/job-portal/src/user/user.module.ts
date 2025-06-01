@@ -2,17 +2,18 @@ import { forwardRef, Module } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserController } from './user.controller';
 import { MongooseModule } from '@nestjs/mongoose';
-import { UserSchema } from './entities/user.entity';
+import { User, UserSchema } from './entities/user.entity';
 import { adminSchema } from '../admin/entities/admin.entity';
 import { CondidateSchema } from '../condidates/entities/condidate.entity';
 import { CopmanySchema } from '../company/entities/company.entity';
 import { CommentModule } from 'src/comment/comment.module';
+import { JobApplicationSchema } from 'src/jobapplication/entities/jobapplication.entity';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       {
-        name: 'user',
+        name: User.name,
         schema: UserSchema,
         discriminators: [
           { name: 'admin', schema: adminSchema },

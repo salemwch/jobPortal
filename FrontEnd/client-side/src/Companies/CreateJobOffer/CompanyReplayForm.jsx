@@ -1,0 +1,83 @@
+import { useState } from "react";
+import commentService from "../../services/commentService";
+
+const CompanyReplyForm = ({ commentId, onResponseSent }) => {
+  const [reply, setReply] = useState("");
+  const [posting, setPosting] = useState(false);
+  const [showReplyForm, setShowReplyForm] = useState(false);
+
+  const handleReply = async () => {
+    const storedUser = sessionStorage.getItem("user");
+
+    if (!storedUser) {
+      alert("You must be logged in.");
+      return;
+    }
+
+    const parsedUser = JSON.parse(storedUser);
+    const token = parsedUser?.refreshToken;
+    const user = parsedUser?.user;
+
+    if (!token || !user?._id) {
+      alert("Token or user ID missing.");
+      return;
+    }
+
+    const responder = user?.name || "Company";
+
+    try {
+      setPosting(true);
+      await commentService.respondToComment(
+        token,
+        commentId,
+        user._id,
+        reply,
+        responder,
+        user.role
+      );
+      alert("Reply sent!");
+      setReply("");
+      setShowReplyForm(false);
+      if (onResponseSent) {
+        onResponseSent();
+      }
+    } catch (err) {
+      console.error("Failed to send reply", err);
+      alert(err?.response?.data?.message || "Something went wrong.");
+    } finally {
+      setPosting(false);
+    }
+  };
+
+  return (
+    <div className="mt-3">
+      {showReplyForm ? (
+        <>
+          <textarea
+            className="form-control"
+            rows="2"
+            value={reply}
+            placeholder="Write your reply to the condidate..."
+            onChange={(e) => setReply(e.target.value)}
+          />
+          <button
+            className="btn btn-sm btn-primary mt-2"
+            onClick={handleReply}
+            disabled={posting}
+          >
+            {posting ? "Posting..." : "Send Reply"}
+          </button>
+        </>
+      ) : (
+        <button
+          className="btn btn-sm btn-outline-secondary mt-2"
+          onClick={() => setShowReplyForm(true)}
+        >
+          Reply to Condidate
+        </button>
+      )}
+    </div>
+  );
+};
+
+export default CompanyReplyForm;

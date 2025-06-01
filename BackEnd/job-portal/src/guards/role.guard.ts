@@ -1,11 +1,5 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  ForbiddenException,
-  Injectable,
-} from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { Observable } from 'rxjs';
 import { UserRole } from 'src/userRole/userRole';
 
 @Injectable()
@@ -28,6 +22,6 @@ export class RoleGuard implements CanActivate {
     console.log(
       `role guard: user role is ${user.role} required role: ${requiredRole}`
     );
-    return user.role === requiredRole;
+    return requiredRole.includes(user.role);
   }
 }

@@ -7,7 +7,7 @@ const RoleBasedStatistics = () => {
 
   useEffect(() => {
     const storedUser = JSON.parse(sessionStorage.getItem("user"));
-    setUserRole(storedUser?.user?.role || "guest");
+    setUserRole(storedUser?.user?.role);
   }, []);
 
   if (userRole === "condidate") {

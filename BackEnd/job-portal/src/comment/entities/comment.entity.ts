@@ -19,6 +19,7 @@ export class Comment extends Document {
     type: {
       message: { type: String },
       responder: { type: String },
+      updatedAt: { type: Date },
     },
     default: null,
   })

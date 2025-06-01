@@ -36,20 +36,16 @@ export class JobOfferService {
         `Company with id ${companyId} is not approved to create job offers`
       );
     }
-    // 1. Save job offer
     const newJobOffer = new this.jobOfferModel(createJobOfferDto);
     const savedJobOffer = await newJobOffer.save();
-    // 2. Update company with job offer reference
     await this.companyModel.findByIdAndUpdate(
       companyId,
       { $push: { jobOffers: savedJobOffer._id } },
       { new: true }
     );
-    // 3. Get condidates from same location
     const condidates = await this.condidateModel.find({
       location: createJobOfferDto.location,
     });
-    // 4. Notify matching condidates based on skills
     for (const condidate of condidates) {
       const condidateSkills = condidate.skills || [];
       const jobSkills = createJobOfferDto.requiredSkills || [];
@@ -87,18 +83,15 @@ export class JobOfferService {
     try {
       const jobOffer = await this.jobOfferModel
         .findById(id)
+        
         .populate('company');
-      // Check if the job offer was found
       if (!jobOffer) {
-        // If not found, throw an error with a detailed message
         console.error(`JobOffer with ID: ${id} not found`);
         throw new BadRequestException(`Job offer with id: ${id} not found`);
       }
 
-      // Return the found job offer
       return jobOffer;
     } catch (error) {
-      // Log detailed error message before throwing it
       console.error(
         `Error occurred while fetching JobOffer with ID: ${id}`,
         error
@@ -115,12 +108,24 @@ export class JobOfferService {
   }
 
   async delete(id: string): Promise<IJobOffer> {
-    const deleteJobOffer = await this.jobOfferModel.findByIdAndDelete(id);
+    const deleteJobOffer = await this.jobOfferModel.findById(id);
+
     if (!deleteJobOffer) {
-      throw new BadRequestException(`job offer with id : ${id} not found`);
+      throw new BadRequestException(`Job offer with id: ${id} not found`);
     }
+
+    // Remove job offer reference from company's jobOffers array
+    await this.companyModel.updateOne(
+      { _id: deleteJobOffer.company },
+      { $pull: { jobOffers: id } }
+    );
+
+    // Now delete the job offer itself
+    await this.jobOfferModel.findByIdAndDelete(id);
+
     return deleteJobOffer;
   }
+
   async search(query: any): Promise<IJobOffer[]> {
     const filters: any = {};
     if (query.title) {
@@ -130,10 +135,29 @@ export class JobOfferService {
       filters.location = { $regex: query.location, $options: 'i' };
     }
     if (query.salaryMin || query.salaryMax) {
-      filters.salary = {};
-      if (query.salaryMin) filters.salary.$gte = query.salaryMin;
-      if (query.salaryMax) filters.salary.$lte = query.salaryMax;
+      const salaryFilter: any = {};
+
+      if (
+        query.salaryMin !== undefined &&
+        query.salaryMin !== '' &&
+        !isNaN(Number(query.salaryMin))
+      ) {
+        salaryFilter.$gte = Number(query.salaryMin);
+      }
+
+      if (
+        query.salaryMax !== undefined &&
+        query.salaryMax !== '' &&
+        !isNaN(Number(query.salaryMax))
+      ) {
+        salaryFilter.$lte = Number(query.salaryMax);
+      }
+
+      if (Object.keys(salaryFilter).length > 0) {
+        filters.salary = salaryFilter;
+      }
     }
+
     if (query.requirements) {
       filters.requirements = { $regex: query.requirements, $options: 'i' };
     }
@@ -148,7 +172,6 @@ export class JobOfferService {
   }
   async incrementViewCount(id: string): Promise<JobOffer> {
     const jobOffer = await this.jobOfferModel.findById(id);
-    console.log('Updated JobOffer with Test Applications:', jobOffer);
     if (!jobOffer) {
       throw new BadRequestException(`job offer with id:  ${id} not found`);
     }
@@ -167,8 +190,13 @@ export class JobOfferService {
       .exec();
   }
   async findCompanybyID(companyId: string): Promise<IJobOffer[]> {
-    return this.jobOfferModel.find({ company: companyId }).exec();
+    const result = await this.jobOfferModel
+      .find({ company: companyId })
+      .populate('company')
+      .exec();
+    return result;
   }
+
   async updatedStatusOffer(
     id: string,
     updateDataDto: UpdateJobOfferDto

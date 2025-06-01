@@ -1,4 +1,12 @@
-import { IsMongoId, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import {
+  ArrayNotEmpty,
+  IsArray,
+  IsMongoId,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export class CreateJobOfferDto {
   @IsString()
@@ -16,9 +24,11 @@ export class CreateJobOfferDto {
   @IsString()
   @IsNotEmpty()
   requirements: string;
-  @IsString()
+  @IsNumber()
   @IsNotEmpty()
-  salary: string;
-  @IsString()
+  salary: number;
+  @IsArray()
+  @ArrayNotEmpty()
+  @IsString({ each: true })
   requiredSkills: string[];
 }

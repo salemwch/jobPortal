@@ -1,9 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, SchemaTypes, Types } from 'mongoose';
+import { User } from 'src/user/entities/user.entity';
 
 @Schema()
 export class Notification extends Document {
-  @Prop({ type: SchemaTypes.ObjectId, ref: 'User', required: true })
+  @Prop({ type: SchemaTypes.ObjectId, ref: User.name, required: true })
   user: Types.ObjectId;
   @Prop({ required: true })
   message: string;

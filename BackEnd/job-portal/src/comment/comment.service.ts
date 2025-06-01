@@ -5,29 +5,34 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { CreateCommentDto } from './dto/create-comment.dto';
-import { UpdateCommentDto } from './dto/update-comment.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, ObjectId, Types } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { Comment } from './entities/comment.entity';
 import { ModerateCommentDto } from './moderatecommentDto';
 import { IJobOffer } from 'src/joboffer/interface/InterfaceJobOffer';
-import { ICondidate } from 'src/condidates/Interface/interface';
-import { User } from 'src/user/entities/user.entity';
+import { NotificationGateway } from 'src/notification/notification.getway';
 
 @Injectable()
 export class CommentService {
   constructor(
     @InjectModel('comment') private readonly commentModel: Model<Comment>,
-    @InjectModel('JobOffer') private readonly jobOfferModel: Model<IJobOffer>
+    @InjectModel('JobOffer') private readonly jobOfferModel: Model<IJobOffer>,
+    private readonly notificationGateway: NotificationGateway
   ) {}
   async create(createCommentDto: CreateCommentDto): Promise<Comment> {
     const newComment = new this.commentModel(createCommentDto);
-    return newComment.save();
+    const savedComment = await newComment.save();
+    this.notificationGateway.server.emit('commentAdded', {
+      jobOfferId: savedComment.jobOffer.toString(),
+      comment: savedComment,
+    });
+    return savedComment;
   }
   async findAll(companyId: string): Promise<Comment[]> {
     return this.commentModel
       .find({ company: companyId })
       .populate('condidate', 'name')
+      .populate('company', 'name')
       .exec();
   }
   async findByJobOffer(jobOfferId: string): Promise<Comment[]> {
@@ -78,9 +83,12 @@ export class CommentService {
         responder,
       });
     }
-
-    await comment.save();
-    return comment;
+    const updatedComment = await comment.save();
+    this.notificationGateway.server.emit('commentReplied', {
+      jobOfferId: updatedComment.jobOffer.toString(),
+      comment: updatedComment,
+    });
+    return updatedComment;
   }
 
   async moderateComment(

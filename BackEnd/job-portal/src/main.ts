@@ -5,6 +5,7 @@ import * as dotenv from 'dotenv';
 import { join } from 'path';
 import * as express from 'express';
 import { IoAdapter } from '@nestjs/platform-socket.io';
+import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 
 async function bootstrap() {
   dotenv.config();
@@ -13,6 +14,7 @@ async function bootstrap() {
   app.use('/uploads', express.static(join(__dirname, '..', 'uploads')));
 
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
+  app.useGlobalFilters(new GlobalExceptionFilter());
   await app.listen(3000);
 }
 bootstrap();

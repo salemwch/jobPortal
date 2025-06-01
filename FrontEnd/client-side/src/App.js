@@ -21,6 +21,14 @@ import JobResults from './search/JobResults';
 import RoleBasedStatistics from './RoleBasedStatistic/RoleStatistics';
 import DashboardCompanie from './Companies/DashboardCompanie';
 import CompanyProfile from './Companies/companieProfile/CompanyProfile';
+import CreateJobOffer from './Companies/CreateJobOffer/CreateJobOffer';
+import CompaniesList from './condidate/companyprofile/companiesList';
+import CompanyProfilePage from './condidate/companyprofile/CompanyProfilePage';
+import CondidateResults from './componenets/Search/CondidateResult';
+import PublicCondidateProfile from './Companies/PublicCondidateProfile/PublicCondidateProfile';
+import CondidateList from './Companies/PublicCondidateProfile/CondidateList';
+import CondidateApplyed from './Companies/ApplyedCondidates/CondidateApplyed';
+import EditJobOffer from './Companies/editJobOffer/EditJobOffer';
 function PrivateRoute({  allowedRoles }) {
   const user = sessionStorage.getItem("user") ? JSON.parse(sessionStorage.getItem("user")): null;
 
@@ -36,6 +44,7 @@ function PrivateRoute({  allowedRoles }) {
 function App() {
   return (
     <Router>
+    
       <Routes>
         <Route path = '/' element ={  <Home/> }>
         <Route path ='/' element ={<Layout/>}/>
@@ -51,13 +60,24 @@ function App() {
         <Route path = '/JobApplicationForm' element={ <JobApplicationForm></JobApplicationForm> }/>
         <Route path="/apply/:jobOfferId" element={<JobApplicationForm/>} />
         <Route path="/condidates/:id" element={<CondidateProfile/>} />
-        <Route path ='/job-offer/:id' element={<JobOfferDetails/>}/>
         <Route path="/job-results" element={<JobResults />} />
-        </Route>
+        <Route path="/condidate/companies" element={<CompaniesList />}/>
+        </Route><Route path="/view-company/:id" element={<CompanyProfilePage/>} />
+        <Route path="/condidates" element={<CondidateList />} />
+        <Route path ="/PublicCondidateProfile/:id" element={<PublicCondidateProfile />}/>
+
+        
         <Route element ={<PrivateRoute allowedRoles={['company']} />}>
-        <Route path="/DashboardCompanie" element={<DashboardCompanie/>}/>
+        <Route path="/Dashboard/company" element={<DashboardCompanie/>}/>
         <Route path ="/company/:id" element={<CompanyProfile/>}/>
+        <Route path="/create-job-offer" element={<CreateJobOffer />} />
+        <Route path ="/Condidate-Result" element = {<CondidateResults/>}/>
+        <Route path="/public-condidate/:id" element={<PublicCondidateProfile />} />
+        <Route path="/job-offer/:id/applicants" element={<CondidateApplyed/>} />
+        <Route path="/job-offer/:id/edit" element={<EditJobOffer />} />
+
         </Route>
+        <Route path="/job-offer/:id" element={<JobOfferDetails />} />
         <Route path="/Statistics" element= {<RoleBasedStatistics/>}/>
         <Route path ="/login" element = {<Login/>}/>
         <Route path="/SignUpConfirmation" element={<SignUpConfirmation/>}/>

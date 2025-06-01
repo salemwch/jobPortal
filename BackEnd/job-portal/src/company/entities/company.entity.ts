@@ -1,7 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { IsEnum } from 'class-validator';
 import { Document, SchemaTypes, Types } from 'mongoose';
-import { User } from 'src/user/entities/user.entity';
 import { UserRole } from 'src/userRole/userRole';
 
 @Schema()
@@ -13,14 +11,20 @@ export class Company extends Document {
   email: string;
   @Prop({ required: true })
   password: string;
-  @Prop([String])
-  speciality: string[];
+  @Prop({
+    type: [String],
+    set: (speciality: string[]) =>
+      speciality.filter(item => item.trim() !== ''),
+  })
+  speciality?: string[];
   @Prop({ required: true })
   website: string;
   @Prop({ required: true })
   location: string;
   @Prop({ required: true })
   phone: number;
+  @Prop({ required: true })
+  description: string;
   @Prop()
   image?: string;
   @Prop({ default: Date.now })

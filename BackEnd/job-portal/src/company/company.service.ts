@@ -9,15 +9,19 @@ import { IUser } from '../user/Interface/IUser';
 import { UserRole } from '../userRole/userRole';
 import { IJobTest } from 'src/testjobapplication/interface/interfacetest';
 import { IJobOffer } from 'src/joboffer/interface/InterfaceJobOffer';
+import { IJobApplication } from 'src/jobapplication/interface/interfaceJobApplication';
+import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class CompanyService {
   constructor(
     @InjectModel('company') private readonly companyModel: Model<ICompany>,
-    @InjectModel('user') private readonly userModel: Model<IUser>,
+    @InjectModel(User.name) private readonly userModel: Model<IUser>,
     @InjectModel('TestJobApplication')
     private testJobApplicationModel: Model<IJobTest>,
-    @InjectModel('JobOffer') private jobOfferModel: Model<IJobOffer>
+    @InjectModel('JobOffer') private jobOfferModel: Model<IJobOffer>,
+    @InjectModel('JobApplication')
+    private jobApplicationModel: Model<IJobApplication>
   ) {}
   async createCompany(createCompanyDto: CreateCompanyDto): Promise<ICompany> {
     const existingCompany = await this.companyModel.findOne({
@@ -42,7 +46,10 @@ export class CompanyService {
     return argon2.hash(data);
   }
   async getCompanyById(id: string): Promise<ICompany> {
-    const getCompanyById = await this.companyModel.findById(id);
+    const getCompanyById = await this.companyModel
+      .findById(id)
+      .populate('jobOffers')
+      .exec();
     if (!getCompanyById) {
       throw new BadRequestException(`company with id ${id} not found`);
     }
@@ -62,19 +69,30 @@ export class CompanyService {
     id: string,
     updateCompanyDto: UpdateCompanyDto
   ): Promise<ICompany> {
-    if (updateCompanyDto.password) {
-      updateCompanyDto.password = await argon2.hash(updateCompanyDto.password);
-    }
-    const update = await this.companyModel.findByIdAndUpdate(
-      id,
-      { $set: updateCompanyDto },
-      { new: true, runValidators: true }
-    );
-    if (!update) {
-      throw new BadRequestException(`company with id ${id} not found`);
-    }
+    const data = { ...updateCompanyDto } as any;
 
-    return update;
+    if (data.password) {
+      data.password = await argon2.hash(data.password);
+    }
+    delete data.jobOffers;
+    try {
+      const updatedCompany = await this.companyModel
+        .findByIdAndUpdate(
+          id,
+          { $set: data },
+          { new: true, runValidators: true }
+        )
+        .lean();
+      if (!updatedCompany) {
+        throw new BadRequestException(`Company with ID ${id} not found`);
+      }
+      return updatedCompany;
+    } catch (error: any) {
+      if (error.code === 11000 && error.keyPattern?.email) {
+        throw new BadRequestException('This email is already in use.');
+      }
+      throw error;
+    }
   }
 
   async deleteCompany(id: string): Promise<ICompany> {
@@ -104,7 +122,7 @@ export class CompanyService {
       .populate('jobOffers')
       .exec();
     if (company.length === 0) {
-      throw new BadRequestException('no condidates found ');
+      throw new BadRequestException('No companies found');
     }
     return company;
   }
@@ -133,5 +151,21 @@ export class CompanyService {
   }
   async findMostViwed(): Promise<ICompany | null> {
     return this.companyModel.findOne().sort({ viewCount: -1 }).exec();
+  }
+  async getCompanyDashboardStats(companyId: string) {
+    const company = await this.companyModel.findById(companyId);
+    if (!company) throw new BadRequestException('Company not found');
+
+    const jobOffers = await this.jobOfferModel.find({ company: companyId });
+    const jobOfferIds = jobOffers.map(j => j._id);
+    const totalApplicationss = await this.jobApplicationModel.countDocuments({
+      jobOffer: { $in: jobOfferIds },
+    });
+
+    return {
+      totalJobOffers: jobOffers.length,
+      totalJobApplications: totalApplicationss,
+      profileViews: company.viewCount,
+    };
   }
 }

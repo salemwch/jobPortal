@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { CreateDashboardDto } from './dto/create-dashboard.dto';
-import { UpdateDashboardDto } from './dto/update-dashboard.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from 'src/user/entities/user.entity';
@@ -11,7 +10,7 @@ import { TestJobApplication } from 'src/testjobapplication/entities/testjobappli
 @Injectable()
 export class DashboardService {
   constructor(
-    @InjectModel('user') private readonly userModel: Model<User>,
+    @InjectModel(User.name) private readonly userModel: Model<User>,
     @InjectModel('JobOffer') private readonly jobOfferModel: Model<JobOffer>,
     @InjectModel('JobApplication')
     private readonly jobApplicationModel: Model<JobApplication>,

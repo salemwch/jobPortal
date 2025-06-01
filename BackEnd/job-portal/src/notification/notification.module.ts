@@ -13,6 +13,6 @@ import { NotificationGateway } from './notification.getway';
   ],
   controllers: [NotificationController],
   providers: [NotificationService, NotificationGateway],
-  exports: [NotificationService],
+  exports: [NotificationService, NotificationGateway],
 })
 export class NotificationModule {}

@@ -17,11 +17,13 @@ const register = (token,data,file) =>{
             }
         })
     }
-     const getCompanyByQuery =  (token, query) =>{
-        return HTTP.get(`/company/search?query=${query}`,{
-            headers: {Authorization: `Bearer ${token}`}
-        })
-     };
+     const getCandidatesByQuery = (token, query) => {
+  const queryParams = new URLSearchParams(query).toString();
+  return HTTP.get(`/condidate/search?${queryParams}`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+};
+
 
 const getCompanyByID = (token,id)=>{
         console.log("Making request for company ID:", id);
@@ -37,7 +39,12 @@ const updateCompany = (token,id,data,file) =>{
         formData.append("file", file);
     }
     Object.keys(data).forEach(key =>{
-        formData.append(key, data[key]);
+        if(Array.isArray(data[key])){
+            formData.append(key, JSON.stringify(data[key]));
+        } else if(data[key] !== undefined){
+            formData.append(key, data[key]);
+        }
+        
     });
     return HTTP.put(`/company/${id}`, formData,{
         headers:{
@@ -82,6 +89,13 @@ const getMostVisitedCompany = (token) => {
         }
     });
 };
+const getCompanyDashboardStats = (token, id) => {
+  return HTTP.get(`/company/${id}/dashboard-stats`, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+};
 
 
-export default{register,getCompanyByQuery,getCompanyByID,updateCompany,deleteCompany,getAllCompanies,updateDesiredFields,incrementViewCount,getMostVisitedCompany}
+export default{register,getCandidatesByQuery,getCompanyByID,updateCompany,deleteCompany,getAllCompanies,updateDesiredFields,incrementViewCount,getMostVisitedCompany,getCompanyDashboardStats}

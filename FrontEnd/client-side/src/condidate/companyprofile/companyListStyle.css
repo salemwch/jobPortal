@@ -1,0 +1,96 @@
+
+.containerr {
+  width: 90%;
+  margin: 0 auto;
+  padding: 2rem 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.titlee {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #6b21a8;
+  margin-bottom: 2.5rem;
+  text-align: center;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.cardd-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2rem;
+}
+
+.companyy-card {
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 1.5rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 320px;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 1.5rem;
+}
+
+.companyy-card:hover {
+  transform: scale(1.03);
+  border-color: #d8b4fe;
+  box-shadow: 0 20px 40px rgba(128, 90, 213, 0.25);
+}
+
+.cardd-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.cardd-header h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1f2937;
+  flex-grow: 1;
+}
+
+.letterr-logo {
+  width: 50px;
+  height: 50px;
+  background: #ddd6fe;
+  color: #6b21a8;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.2rem;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.cardd-logo {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 3px solid #6b21a8;
+}
+
+.cardd-content {
+  font-size: 0.95rem;
+  color: #374151;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.badgee {
+  background-color: #f3e8ff;
+  color: #7c3aed;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  display: inline-block;
+  width: fit-content;
+}

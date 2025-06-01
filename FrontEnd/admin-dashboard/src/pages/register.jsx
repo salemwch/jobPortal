@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import auth from "../services/auth";
+import AdminService from "../services/AdminService";
 
 const Register = () => {
 
@@ -15,7 +15,7 @@ const Register = () => {
 
   const onsubmitHandler = (e) =>{
     e.preventDefault()
-    auth.createAdmin(data).then((res)=>{
+    AdminService.createAdmin(data).then((res)=>{
         navigate("/login")
         console.log(res.data)
     }).catch((error) =>{

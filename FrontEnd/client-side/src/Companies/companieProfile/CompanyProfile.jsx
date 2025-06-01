@@ -11,14 +11,16 @@ const CompanyProfile = () =>{
     const [editMode, setEditMode] = useState(false);
     const [company, setCompany] = useState(null)
     const [selectedFile, setSelectedFile] = useState(null);
+    const [specialityInput, setSpecialityInput] = useState('');
     const [formData, setFormData] = useState({
-        name:'',
-        email:'',
-        password:'',
-        phone:'',
-        specialtiy:[''],
-        location:'',
-        website:'',
+        name: '',
+        email: '',
+        phone: '',
+        speciality: [],
+        location: '',
+        website: '',
+        description: '',
+        password: '',
     });
     
     const IMAGE_BASE_URL = "http://localhost:3000/uploads"; 
@@ -34,21 +36,26 @@ const CompanyProfile = () =>{
                 await companyservice.incrementViewCount(token, id, viewerId);
             }
             const response = await companyservice.getCompanyByID(token,id);
-            const companyData = response.data.getCompanyByID;
-            setCompany(companyData);
+            const companyData = response.data.getCompanybyID;
+            if(!companyData){
+              console.warn("company not found");
+              return
+            }
+            delete companyData.password;
+            setCompany(companyData)
             const storedUser = JSON.parse(sessionStorage.getItem("user"));
             if(storedUser && storedUser.user){
                 storedUser.user.image = companyData.image;
                 sessionStorage.setItem("user", JSON.stringify(storedUser));
             }
             setFormData(companyData);
-            console.log("companyData:", companyData);
         }catch(error){
-            console.log("error fetching company", error.message )
+            console.log("error fetching company", error)
         }finally{
             setLoading(false);
         }
        };
+       
        fetchCompany();
     },[id]);
 
@@ -59,13 +66,16 @@ const handleUpdateProfile = async (e) =>{
         ? JSON.parse(sessionStorage.getItem("user")).refreshToken
         : null;
         
-        const updateData = {...formData};
-        const response = await companyservice.updateCompany(token,id,updateData,selectedFile);
-        setCompany(response.data.updateCompany);
-        setFormData(response.data.updateCompany);
+        const updateCompanyDto = {...formData};
+        if (!formData.password) {
+  delete updateCompanyDto.password;
+}
+        const response = await companyservice.updateCompany(token,id,updateCompanyDto,selectedFile);
+        setCompany(response.data.updatedCompany);
+        setFormData(response.data.updatedCompany);
         const stored = JSON.parse(sessionStorage.getItem("user"));
         sessionStorage.setItem("user", JSON.stringify({
-            user: response.data.updateCompany,
+            user: response.data.updatedCompany,
             refreshToken: stored?.refreshToken || ""
         
         }));
@@ -80,8 +90,8 @@ const handleUpdateProfile = async (e) =>{
         });
         setEditMode(false);
         }catch(error){
-            console.log("error updating company", error.message);
-            const errorMessage = error?.response?.data?.message || "error updating company";
+            console.log("error updating profile", error);
+            const errorMessage = error?.response?.data?.message;
             const specificError = error?.response?.data?.error;
             if(specificError === "this email is already in use."){
                 Swal.fire({
@@ -104,7 +114,7 @@ const handleDeleteAccount = async () =>{
         try{
             const token = sessionStorage.getItem("user") ? JSON.parse(sessionStorage.getItem("user")).refreshToken : null;
             await companyservice.deleteCompany(token,id);
-            localStorage.removeItem("user");
+            sessionStorage.removeItem("user");
             alert("Account deleted successfully");
             navigate("/");
         }catch(error){
@@ -113,11 +123,23 @@ const handleDeleteAccount = async () =>{
         }
     }
 };
-const handleChange = (e) =>{
-    const {name, value} = e.target;
-    setFormData((prev) => ({...prev, [name]: value}))
-}
+const handleChange = (e) => {
+  const { name, value } = e.target;
 
+  if (name === "speciality") {
+    setSpecialityInput(value);
+
+    const specialityArray = value
+      .split(',')
+      .map(item => item.trim())
+      .filter(item => item);
+    
+    setFormData(prev => ({ ...prev, [name]: specialityArray }));
+  } else {
+    setFormData(prev => ({ ...prev, [name]: value }));
+  }
+};
+  
     return (
         <div>
             <Header/>
@@ -175,15 +197,15 @@ const handleChange = (e) =>{
             />
           </div>
           <div className="mb-3">
-            <label className="form-label">Speciality:</label>
-            <input
-              type="text"
-              className="form-control"
-              name="specialtiy"
-              value={formData.specialtiy}
-              onChange={handleChange}
-            />
-          </div>
+  <label className="form-label">Speciality (comma separated):</label>
+  <input
+  type="text"
+  className="form-control"
+  name="speciality"
+  value={specialityInput}
+  onChange={handleChange}
+/>
+</div>
           <div className="mb-3">
             <label className="form-label">Website:</label>
             <input
@@ -203,6 +225,30 @@ const handleChange = (e) =>{
               value={formData.location}
               onChange={handleChange}
             />
+            <div className="mb-3">
+            <label className="form-label">Description:</label>
+            <input
+              type="text"
+              className="form-control"
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+            />
+          </div>
+          <div className="mb-3">
+  <label className="form-label">Password (optional):</label>
+  <input
+    type="password"
+    className="form-control"
+    name="password"
+    value={formData.password}
+    onChange={handleChange}
+  />
+</div>
+<small className="text-muted">Leave password fields empty to keep your current password.</small>
+
+
+
           </div>
           <div className="mb-3">
             <label className="form-label">Logo (optional):</label>
@@ -225,9 +271,10 @@ const handleChange = (e) =>{
           <p><strong>Name:</strong> {company.name}</p>
           <p><strong>Email:</strong> {company.email}</p>
           <p><strong>Phone:</strong> {company.phone || "N/A"}</p>
-          <p><strong>Speciality:</strong> {company.specialtiy || "No speciality listed"}</p>
+          <p><strong>Speciality:</strong> {company.speciality?.join(' ') || "No speciality listed"}</p>
           <p><strong>Website:</strong> {company.website || "No website listed"}</p>
           <p><strong>Location:</strong> {company.location || "No location listed"}</p>
+           <p><strong >Description:</strong> {company.description || "No description listed"}</p>
           <p><strong>Views:</strong> {company.viewCount || 0}</p>
           
           <button 

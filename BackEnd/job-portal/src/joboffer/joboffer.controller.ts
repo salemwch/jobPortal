@@ -10,12 +10,10 @@ import {
   HttpStatus,
   Put,
   Query,
-  UseGuards,
 } from '@nestjs/common';
 import { JobOfferService } from './joboffer.service';
 import { CreateJobOfferDto } from './dto/createjoboffer.dto';
 import { UpdateJobOfferDto } from './dto/updatejoboffer.dto';
-import { response } from 'express';
 
 @Controller('job-offer')
 export class JobOfferController {
@@ -38,7 +36,7 @@ export class JobOfferController {
       });
     }
   }
-  @Get(':jobOfferId/tests') // Get tests for a specific job offer
+  @Get(':jobOfferId/tests')
   async findTestsByJobOfferId(@Param('jobOfferId') jobOfferId: string) {
     try {
       const tests =
@@ -109,20 +107,16 @@ export class JobOfferController {
   @Get('/data/:id')
   async getDataById(@Res() response, @Param('id') id: string) {
     try {
-      // Call the service to get the data
       const getDataId = await this.jobOfferService.findById(id);
 
-      // Return the response when data is fetched successfully
       return response.status(HttpStatus.ACCEPTED).json({
         message: 'Data fetched successfully',
         getDataId,
         statusCode: 200,
       });
     } catch (error) {
-      // Log the error with more detailed information
       console.error(`Error fetching job offer with ID: ${id}`, error);
 
-      // Return a more detailed error response
       return response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         message: 'Error fetching job offer',
         error: error instanceof Error ? error.message : 'Unknown error',

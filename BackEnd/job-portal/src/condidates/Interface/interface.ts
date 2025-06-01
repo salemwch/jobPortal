@@ -1,7 +1,4 @@
-import { IsEnum } from 'class-validator';
-import { Document, Types } from 'mongoose';
-import { User } from 'src/user/entities/user.entity';
-import { IUser } from 'src/user/Interface/IUser';
+import { Document } from 'mongoose';
 import { UserRole } from 'src/userRole/userRole';
 
 export interface ICondidate extends Document {
@@ -22,4 +19,5 @@ export interface ICondidate extends Document {
   status: string;
   createdAt: Date;
   viewers: string[];
+  description: string;
 }

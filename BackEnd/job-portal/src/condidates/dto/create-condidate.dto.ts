@@ -9,7 +9,7 @@ import {
 } from 'class-validator';
 import { CreateUserDto } from '../../user/dto/create-user.dto';
 import { UserRole } from '../../userRole/userRole';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 
 export class CreateCondidateDto extends CreateUserDto {
   @IsNotEmpty()
@@ -38,8 +38,18 @@ export class CreateCondidateDto extends CreateUserDto {
   @IsOptional()
   workExperience?: string;
   @IsArray()
-  @IsNotEmpty()
+  @IsString({ each: true })
   @IsOptional()
+  @Transform(({ value }) => {
+    if (typeof value === 'string') {
+      try {
+        return JSON.parse(value);
+      } catch {
+        return [];
+      }
+    }
+    return value;
+  })
   skills?: string[];
   @IsString()
   @IsNotEmpty()
@@ -51,4 +61,7 @@ export class CreateCondidateDto extends CreateUserDto {
   @IsString()
   @IsOptional()
   image?: string;
+  @IsString()
+  @IsOptional()
+  description: string;
 }

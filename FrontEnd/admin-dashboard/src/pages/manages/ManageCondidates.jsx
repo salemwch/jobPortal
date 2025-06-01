@@ -8,6 +8,11 @@ const ManageCandidates = () => {
   const [condidates, setCondidates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchEmail, setSearchEmail] = useState('');
+  const [searchId, setSearchId] = useState('');
+  const [searchType, setSearchType] = useState('email');
+const [searchValue, setSearchValue] = useState('');
+
+
   const token = localStorage.getItem("user")
   ? JSON.parse(localStorage.getItem("user")).tokens.refreshToken
   : null;
@@ -50,20 +55,33 @@ const ManageCandidates = () => {
   };
 
   const handleSearch = async () => {
-    if (!searchEmail) {
-      loadCondidates();
-      return;
-    }
-    
-    try {
-      const response = await condidateService.getCondidateByEmail(token, searchEmail);
+  if (!searchValue.trim()) {
+    loadCondidates();
+    return;
+  }
+
+  try {
+    if (searchType === 'email') {
+      const response = await condidateService.getCondidateByEmail(token, searchValue);
       if (response.data.condidate) {
         setCondidates([response.data.condidate]);
+      } else {
+        alert('Condidate not found');
       }
-    } catch (error) {
-      alert('Candidate not found');
+    } else if (searchType === 'id') {
+      const response = await condidateService.getCondidateById(token, searchValue);
+      if (response.data.getCondidateById) {
+        setCondidates([response.data.getCondidateById]);
+      } else {
+        alert('Condidate not found');
+      }
     }
-  };
+  } catch (error) {
+    alert('Condidate not found or invalid input');
+  }
+};
+
+
 
   
 
@@ -82,30 +100,34 @@ const ManageCandidates = () => {
       <div className="card-body">
         <div className="d-flex justify-content-between align-items-center mb-4">
           <h5 className="card-title">Manage Condidates</h5>
-          <div className="d-flex gap-3">
-            <div className="input-group">
-              <input
-                type="text"
-                className="form-control"
-                placeholder="Search by email"
-                value={searchEmail}
-                onChange={(e) => setSearchEmail(e.target.value)}
-              />
-              <button 
-                className="btn btn-outline-secondary" 
-                type="button"
-                onClick={handleSearch}
-              >
-                Search
-              </button>
-            </div>
-            <button 
-              className="btn btn-primary"
-              onClick={() => window.location.href = '/dashboard/candidates/new'}
-            >
-              Add Candidate
-            </button>
-          </div>
+          <div className="d-flex align-items-center gap-2">
+  <select
+    className="form-select"
+    style={{ width: '150px' }}
+    value={searchType}
+    onChange={(e) => setSearchType(e.target.value)}
+  >
+    <option value="email">Search by Email</option>
+    <option value="id">Search by ID</option>
+  </select>
+
+  <input
+    type="text"
+    className="form-control"
+    placeholder={`Enter ${searchType}`}
+    value={searchValue}
+    onChange={(e) => setSearchValue(e.target.value)}
+  />
+
+  <button 
+    className="btn btn-outline-secondary" 
+    type="button"
+    onClick={handleSearch}
+  >
+    Search
+  </button>
+</div>
+
         </div>
 
         <div className="table-responsive">

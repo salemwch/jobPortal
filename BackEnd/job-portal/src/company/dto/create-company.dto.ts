@@ -1,5 +1,6 @@
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
+  IsArray,
   IsEmail,
   IsEnum,
   IsNotEmpty,
@@ -24,14 +25,30 @@ export class CreateCompanyDto extends CreateUserDto {
   email: string;
   @IsString()
   @IsNotEmpty()
-  @MinLength(6, { message: 'password must be at least 6 charachters long.' })
   password: string;
   @IsString()
+  @IsOptional()
+  description: string;
+  @IsArray()
+  @IsString({ each: true })
   @IsNotEmpty()
-  speciality: string[];
+  @IsOptional()
+  @Transform(({ value }) => {
+    if (typeof value === 'string') {
+      try {
+        return JSON.parse(value);
+      } catch {
+        return [];
+      }
+    }
+    return value;
+  })
+  speciality?: string[];
+
   @IsString()
   @IsNotEmpty()
-  website: string;
+  @IsOptional()
+  website?: string;
   @IsString()
   @IsNotEmpty()
   location: string;
@@ -40,5 +57,6 @@ export class CreateCompanyDto extends CreateUserDto {
   @Type(() => Number)
   phone: number;
   @IsString()
+  @IsOptional()
   image?: string;
 }

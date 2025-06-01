@@ -58,7 +58,7 @@
     -->
     <title>React App</title>
   </head>
-  <body >
+  <body id="top">
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
     <!--
@@ -91,6 +91,23 @@
     <script src="lib/waypoints/waypoints.min.js"></script>
     <script src="lib/owlcarousel/owl.carousel.min.js"></script>
     <script src="js/main.js"></script>
+    <script>
+  var siteMenuToggle = function () {
+    $('body').on('click', '.js-menu-toggle', function (e) {
+      e.preventDefault();
+
+      if ($('body').hasClass('offcanvas-menu')) {
+        $('body').removeClass('offcanvas-menu');
+      } else {
+        $('body').addClass('offcanvas-menu');
+      }
+    });
+  };
+
+  $(document).ready(function () {
+    siteMenuToggle();
+  });
+</script>
 
   </body>
 </html>

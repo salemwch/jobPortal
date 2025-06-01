@@ -8,12 +8,13 @@ import * as argon2 from 'argon2';
 import { UserRole } from '../userRole/userRole';
 import { IUser } from '../user/Interface/IUser';
 import { IJobTest } from '../testjobapplication/interface/interfacetest';
+import { User } from 'src/user/entities/user.entity';
 @Injectable()
 export class CondidatesService {
   constructor(
     @InjectModel('condidate')
     private readonly condidateModel: Model<ICondidate>,
-    @InjectModel('user') private readonly userModel: Model<IUser>,
+    @InjectModel(User.name) private readonly userModel: Model<IUser>,
     @InjectModel('TestJobApplication')
     private readonly testJobApplicationModel: Model<IJobTest>
   ) {}
@@ -63,11 +64,9 @@ export class CondidatesService {
     updateData: UpdateCondidateDto
   ): Promise<ICondidate> {
     const data = { ...updateData } as any;
-    // Hash password if exists
     if (data.password) {
       data.password = await argon2.hash(data.password);
     }
-    // Remove forbidden fields
     delete data.jobApplications;
     delete data.testJobApplication;
     try {
@@ -109,19 +108,45 @@ export class CondidatesService {
   }
 
   async searchCondidate(query: any): Promise<ICondidate[]> {
-    const { name, skills, email } = query;
+    const { name, skills, email, location } = query;
     const searchQuery: any = {};
+
+    let skillTerms: string[] = [];
+
     if (name) {
       searchQuery.name = new RegExp(name, 'i');
     }
+
     if (skills) {
-      searchQuery.skills = { $in: skills.split(',') };
+      skillTerms = skills
+        .split(',')
+        .map((term: string) => term.trim().toLowerCase().replace(/\s+/g, ''));
     }
+
     if (email) {
-      searchQuery.email = email;
+      searchQuery.email = new RegExp(email, 'i');
     }
-    return this.condidateModel.find(searchQuery);
+
+    if (location) {
+      searchQuery.location = new RegExp(location, 'i');
+    }
+
+    const candidates = await this.condidateModel.find();
+    return candidates.filter((c: any) => {
+      const normalizedSkills = (c.skills || []).map((s: string) =>
+        s.toLowerCase().replace(/\s+/g, '')
+      );
+
+      return (
+        (!skillTerms.length ||
+          skillTerms.some(term => normalizedSkills.includes(term))) &&
+        (!name || new RegExp(name, 'i').test(c.name)) &&
+        (!email || new RegExp(email, 'i').test(c.email)) &&
+        (!location || new RegExp(location, 'i').test(c.location))
+      );
+    });
   }
+
   async updateDesiredFields(
     id: string,
     updateDto: UpdateCondidateDto
@@ -143,13 +168,12 @@ export class CondidatesService {
     }
     // Avoid self-view
     if (profile._id.toString() === viewerId) {
-      return profile; // Don't count self-views
+      return profile;
     }
     profile.viewers = profile.viewers || [];
     if (profile.viewers.includes(viewerId)) {
-      return profile; // Already counted
+      return profile;
     }
-    // ✅ Push viewerId and increment viewCount
     profile.viewers.push(viewerId);
     profile.viewCount += 1;
     return await profile.save();

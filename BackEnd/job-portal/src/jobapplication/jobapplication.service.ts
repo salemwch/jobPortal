@@ -18,6 +18,7 @@ import { IJobTest } from 'src/testjobapplication/interface/interfacetest';
 import { NotificationService } from 'src/notification/notification.service';
 import { MailService } from 'src/mailtrap/mailservice';
 import { Company } from 'src/company/entities/company.entity';
+import { User } from 'src/user/entities/user.entity';
 type PopulatedJobOffer = IJobOffer & { company: Company };
 
 @Injectable()
@@ -27,7 +28,7 @@ export class JobApplicationService {
     private readonly jobApplicationModel: Model<IJobApplication>,
     private readonly testJobApplicationService: TestJobApplicationService,
     @InjectModel('JobOffer') private readonly jobOfferModel: Model<IJobOffer>,
-    @InjectModel('user') private readonly userModel: Model<IUser>,
+    @InjectModel(User.name) private readonly userModel: Model<IUser>,
     @InjectModel('condidate')
     private readonly condidateModel: Model<ICondidate>,
     @InjectModel('TestJobApplication')
@@ -91,7 +92,6 @@ export class JobApplicationService {
     if (!jobOfferPopulated?.company?._id) {
       throw new Error('Company ID not found for notification');
     }
-    // ✅ Send a notification to the company about the new application
     await this.notificationService.create({
       user: jobOfferPopulated.company._id.toString(), // target company user
       message: `${createJobApplication.name} has applied to your job offer "${jobOfferPopulated.title}".`,
@@ -253,6 +253,14 @@ export class JobApplicationService {
       .find()
       .sort({ createdAt: -1 })
       .limit(limit)
+      .exec();
+  }
+  async getApplicantsByJobOffer(
+    jobOfferId: string
+  ): Promise<IJobApplication[]> {
+    return await this.jobApplicationModel
+      .find({ jobOffer: jobOfferId })
+      .populate('condidate')
       .exec();
   }
 }

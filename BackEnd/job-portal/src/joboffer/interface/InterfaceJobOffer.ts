@@ -5,8 +5,9 @@ export interface IJobOffer extends Document {
   description: string;
   company: PopulatedDoc<ICompany>;
   location?: string;
-  requirement: string;
-  salary: string;
+  requirement: string[];
+  salary: number;
   viewCount?: number;
   status: string;
+  requiredSkills: string[];
 }

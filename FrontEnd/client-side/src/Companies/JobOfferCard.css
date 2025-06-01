@@ -1,0 +1,80 @@
+.job-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin: 15px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: auto; /* Important: Remove fixed height */
+  max-width: 350px;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.job-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.15);
+}
+
+.job-card h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.job-card p {
+  font-size: 0.95rem;
+  color: #333;
+  flex-grow: 1;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  margin-top: auto;
+}
+
+.card-actions button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.25s ease;
+  flex: 1 1 45%;
+  min-width: 120px;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.card-actions button:hover {
+  background-color: #0056b3;
+}
+
+@media (max-width: 768px) {
+  .job-card {
+    max-width: 100%;
+  }
+
+  .card-actions {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .card-actions button {
+    width: 100%;
+  }
+}

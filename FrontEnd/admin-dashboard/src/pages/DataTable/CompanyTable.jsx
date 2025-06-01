@@ -65,7 +65,12 @@ const CompanyTable = () => {
           <MDBCardTitle><strong>ID:</strong> {company._id}</MDBCardTitle>
           <MDBCardText><strong>Name:</strong> {company.name}</MDBCardText>
           <MDBCardText><strong>Email:</strong> {company.email}</MDBCardText>
-          <MDBCardText><strong>Speciality:</strong> {company.speciality || "N/A"}</MDBCardText>
+<MDBCardText>
+  <strong>Speciality:</strong>{" "}
+  {Array.isArray(company.speciality) && company.speciality.length > 0
+    ? company.speciality.join(", ")
+    : "N/A"}
+</MDBCardText>
           <MDBCardText><strong>Phone:</strong> {company.phone}</MDBCardText>
           <MDBCardText><strong>Website:</strong> {company.website ? <a href={company.website} target="_blank" rel="noopener noreferrer">{company.website}</a> : "N/A"}</MDBCardText>
           <MDBCardText><strong>Location:</strong> {company.location}</MDBCardText>
@@ -75,7 +80,7 @@ const CompanyTable = () => {
   {company.jobOffers.length > 0 ? (
     <ul>
       {company.jobOffers.map((offerId, index) => (
-        <li key={index}>{offerId}</li>
+        <li key={index}>{offerId._id}</li>
       ))}
     </ul>
   ) : (

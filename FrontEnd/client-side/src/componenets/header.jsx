@@ -4,17 +4,23 @@ import NotificationService from '../services/notification';
 import { io } from 'socket.io-client';
 import { getDashboardRoute } from "../helper/helper";
 import { getProfileRoute } from "../helper/helper";
+import CompanySearch from './Search/CompanySearch';
+import CondidateSearchForm from './Search/CondidateSearchForm';
+import moment from 'moment';
+import './Toggle.css';
+
 
 
 const Header = () => {
   const [user, setUser] = useState(null);
-  const [searchText, setSearchText] = useState('');
-  const [locationText, setLocationText] = useState("");
+  
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
-  const dashboardPath = getDashboardRoute(user);
+   const [menuOpen, setMenuOpen] = useState(false);
+  const [pagesDropdownOpen, setPagesDropdownOpen] = useState(false);
 
   const navigate = useNavigate();
+  const dashboardPath = getDashboardRoute(user);
 
   const IMAGE_BASE_URL = "http://localhost:3000/uploads";
   
@@ -78,17 +84,17 @@ const Header = () => {
   
     window.addEventListener("userUpdated", updateUser);
   
-    // Cleanup
     return () => {
       window.removeEventListener("userUpdated", updateUser);
       if (socket) socket.disconnect();
     };
+
   }, []);
 
   
 const handleMarkAsRead = async (id) => {
   try {
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("user");
     await NotificationService.markNotificationAsRead(token, id);
     setNotifications((prev) =>
       prev.map((n) => (n._id === id ? { ...n, read: true } : n))
@@ -101,7 +107,7 @@ const handleMarkAsRead = async (id) => {
 
 const handleDelete = async (id) => {
   try {
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("user");
     await NotificationService.deleteNotification(token, id);
     setNotifications((prev) => prev.filter((n) => n._id !== id));
     const wasUnread = notifications.find((n) => n._id === id && !n.read);
@@ -119,184 +125,214 @@ const handleDelete = async (id) => {
     navigate('/');
   };
   
-  const handleSearchSubmit = (e) => {
-    e.preventDefault();
-    const t = searchText.trim();
-    const l = locationText.trim();
-    const params = [];
-    if (t) params.push(`title=${encodeURIComponent(t)}`);
-    if (l) params.push(`location=${encodeURIComponent(l)}`);
-    
-    // If nothing entered, stay on home
-    if (!params.length) return;
   
-    navigate(`/job-results?${params.join("&")}`);
-  };
+
+
+
   
 
   return (
     <div>
       <div class="site-wrap">
-      <div class="site-mobile-menu site-navbar-target">
-      <div class="site-mobile-menu-header">
-        <div class="site-mobile-menu-close mt-3">
-          <span class="icon-close2 js-menu-toggle"></span>
-        </div>
-      </div>
-      <div class="site-mobile-menu-body"></div>
-    </div>
       <header className="site-navbar mt-3">
         <div className="container-fluid">
-          <div className="row align-items-center">
-            <div className="site-logo col-6">
-              <a href="/">JobBoard</a>
-            </div> 
-            <nav className="mx-auto site-navigation">
-  <ul className="site-menu js-clone-nav d-none d-xl-block ml-0 pl-0">
-    
-    <li><a href="/" className="nav-link active">Home</a></li>
-    <li><a href="/AboutUs">About</a></li>
+          <div className={`row align-items-center ${user?.role !== "company" && user?.role !== "condidate" ? "guest-mode" : ""}`}>
+  <div className="site-logo col-3">
+    <a href="/">JobBoard</a>
+  </div>
 
-    {/* Dynamically render Dashboard link based on user role */}
+  <nav className="col-6 site-navigation d-none d-xl-block">
+  <ul className="site-menu js-clone-nav d-flex justify-content-center align-items-center gap-3 mb-0">
+    <li><Link to="/" className="nav-link active">Home</Link></li>
+    <li><Link to="/AboutUs" className="nav-link">About</Link></li>
 
-{user && (
-  <li>
-    <Link to={getDashboardRoute(user)}>Dashboard</Link>
-  </li>
-)}
+    {user?.role === "condidate" && (
+      <>
+        <li><Link to={getDashboardRoute(user)} className="nav-link">Dashboard</Link></li>
+        <li><Link to="/condidate/companies" className="nav-link">Companies</Link></li>
+      </>
+    )}
 
+    {user?.role === "company" && (
+      <>
+        <li><Link to="/condidates" className="nav-link">Condidates</Link></li>
+        <li><Link to="/Dashboard/company" className="nav-link">Dashboard</Link></li>
+        <li>
+          <Link
+            to="/create-job-offer"
+            className="btn btn-outline-success btn-sm text-nowrap"
+            style={{ marginLeft: "10px" }}
+          >
+            + Create Job Offer
+          </Link>
+        </li>
+      </>
+    )}
 
-
-    <li className="has-children">
-      <a href="/">Pages</a>
+    <li className="has-children nav-link">
+      <Link to="#">Pages</Link>
       <ul className="dropdown">
-        <li><a href="/services">Services</a></li>
-        <li><a href="/Premium">Premium</a></li>
-        <li><a href="/portfolio">Portfolio</a></li>
-        <li><a href="/testimonials">Testimonials</a></li>
-        <li><a href="/faq.html">Frequently Ask Questions</a></li>
+        <li><Link to="/services">Services</Link></li>
+        <li><Link to="/Premium">Premium</Link></li>
+        <li><Link to="/portfolio">Portfolio</Link></li>
+        <li><Link to="/testimonials">Testimonials</Link></li>
+        <li><Link to="/faq.html">FAQ</Link></li>
       </ul>
     </li>
 
-    <li><a href="/blog">Blog</a></li>
-    <li><a href="/Contact">Contact</a></li>
-
-    {!user && (
-      <>
-        <button className="d-lg-none">
-          <a href="/register"><span className="mr-2">+</span> Post a Job</a>
-        </button>
-        <button className="d-lg-none">
-          <a href="/login">Log In</a>
-        </button>
-      </>
-    )}
+    <li><Link to="/blog" className="nav-link">Blog</Link></li>
   </ul>
 </nav>
 
-            <div className="right-cta-menu text-right d-flex align-items-center col-6">
-              <div className="ml-auto d-flex gap-2">
-                {!user ? (
-  <>
-    <Link to="/post-job" className="btn btn-outline-white border-width-2 d-none d-lg-inline-block">
-      <span className="mr-2 icon-add" />Post a Job
-    </Link>
-    <Link to="/login" className="btn btn-primary border-width-2 d-none d-lg-inline-block">
-      <span className="mr-2 icon-lock_outline" />Log In
-    </Link>
-  </>
-) : (
-  <>
-<Link
-  to={getProfileRoute(user)}
-  className="btn btn-outline-white border-width-2 d-none d-lg-inline-block"
-  style={{ borderRadius: '50%', padding: '0' }}
->
-  <img
-    src={user?.image ? `${IMAGE_BASE_URL}/${user.image}` : '/default-avatar.png'}
-    alt="profile"
-    style={{
-      width: '40px',
-      height: '50px',
-      borderRadius: '50%',
-      objectFit: 'cover',
-    }}
-  />
-</Link>
-{/*  Notification Dropdown */}
-<div className="dropdown">
+
+  
+  <div className="right-cta-menu text-right d-flex align-items-center col-3">
+    <div className="ml-auto d-flex gap-2">
+      {!user ? (
+        <>
+          <Link to="/post-job" className="btn btn-outline-white border-width-2 d-none d-lg-inline-block">
+            <span className="mr-2 icon-add" />Post a Job
+          </Link>
+          <Link to="/login" className="btn btn-primary border-width-2 d-none d-lg-inline-block">
+            <span className="mr-2 icon-lock_outline" />Log In
+          </Link>
+        </>
+      ) : (
+        <>
+          <Link
+            to={getProfileRoute(user)}
+            className="btn btn-outline-white border-width-2 d-none d-lg-inline-block"
+            style={{ borderRadius: '50%', padding: '0' }}
+          >
+            <img
+              src={user?.image ? `${IMAGE_BASE_URL}/${user.image}` : '/default-avatar.png'}
+              alt="profile"
+              style={{
+                width: '40px',
+                height: '50px',
+                borderRadius: '50%',
+                objectFit: 'cover',
+              }}
+            />
+          </Link>
+
+          {/* Notification Dropdown */}
+          <div className="dropdown">
+            <button
+              className="btn btn-outline-white border-width-2 d-none d-lg-inline-block dropdown-toggle"
+              type="button"
+              id="notifDropdown"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              🔔{" "}
+              {unreadCount > 0 && (
+                <span className="badge bg-danger">{unreadCount}</span>
+              )}
+            </button>
+
+            <ul className="dropdown-menu" aria-labelledby="notifDropdown">
+              {notifications.length === 0 ? (
+                <li><span className="dropdown-item">No notifications</span></li>
+              ) : (
+                notifications.map((notif, index) => (
+                  <li key={index} className="dropdown-item d-flex justify-content-between align-items-start flex-column">
+                    <div className="w-100 mb-2">
+                      <span className={notif.read ? "" : "fw-bold"}>
+                        {notif.message}
+                      </span>
+                      <span>{moment(notif.createdAt).fromNow()}</span>
+
+                    </div>
+                    <div className="d-flex gap-2 w-100">
+                      <a href={`/job-offer/${notif.jobOffer}`} className="btn btn-sm btn-outline-info">View Job Offer</a>
+                      {!notif.read && (
+                        <button className="btn btn-sm btn-outline-primary" onClick={() => handleMarkAsRead(notif._id)}>Mark as Read</button>
+                      )}
+                      <button className="btn btn-sm btn-outline-danger" onClick={() => handleDelete(notif._id)}>Delete</button>
+                    </div>
+                  </li>
+                ))
+              )}
+            </ul>
+          </div>
+
+          <button onClick={backTo} className="btn btn-danger border-width-2 d-none d-lg-inline-block">
+            Log Out
+          </button>
+        </>
+      )}
+    </div>
   <button
-    className="btn btn-outline-white border-width-2 d-none d-lg-inline-block dropdown-toggle"
-    type="button"
-    id="notifDropdown"
-    data-bs-toggle="dropdown"
-    aria-expanded="false"
+    className="menu-toggle-btn d-xl-none"
+    onClick={() => setMenuOpen(!menuOpen)}
   >
-    🔔{" "}
-    {unreadCount > 0 && (
-      <span className="badge bg-danger">{unreadCount}</span>
-    )}
+    ☰
+  </button>
+  
+
+  </div>
+</div>
+{menuOpen && (
+  <div className="mobile-menu d-xl-none">
+    <button
+      className="menu-close-btn"
+      onClick={() => setMenuOpen(false)}
+      aria-label="Close Menu"
+    >
+      ✕
+    </button>
+    <ul>
+      <li><Link to="/" onClick={() => setMenuOpen(false)}>Home</Link></li>
+      <li><Link to="/AboutUs" onClick={() => setMenuOpen(false)}>About</Link></li>
+
+      {user?.role === "condidate" && (
+        <>
+          <li><Link to={getDashboardRoute(user)} onClick={() => setMenuOpen(false)}>Dashboard</Link></li>
+          <li><Link to="/condidate/companies" onClick={() => setMenuOpen(false)}>Companies</Link></li>
+        </>
+      )}
+
+      {user?.role === "company" && (
+        <>
+          <li><Link to="/condidates" onClick={() => setMenuOpen(false)}>Condidates</Link></li>
+          <li><Link to="/Dashboard/company" onClick={() => setMenuOpen(false)}>Dashboard</Link></li>
+          <li><Link to="/create-job-offer" onClick={() => setMenuOpen(false)}>+ Create Job Offer</Link></li>
+        </>
+      )}
+<li>
+  <button
+    className="dropdown-toggle-btn"
+    onClick={() => setPagesDropdownOpen(!pagesDropdownOpen)}
+  >
+    <strong>Pages</strong>
+    <span className={`arrow ${pagesDropdownOpen ? 'rotate' : ''}`}>▼</span>
   </button>
 
-  <ul className="dropdown-menu" aria-labelledby="notifDropdown">
-    {notifications.length === 0 ? (
-      <li>
-        <span className="dropdown-item">No notifications</span>
-      </li>
-    ) : (
-      notifications.map((notif, index) => (
-        <li key={index} className="dropdown-item d-flex justify-content-between align-items-start flex-column">
-          <div className="w-100 mb-2">
-            <span className={notif.read ? "" : "fw-bold"}>
-              {notif.message}
-            </span>
-          </div>
-        
-          <div className="d-flex gap-2 w-100">
-            <a
-              href={`/job-offer/${notif.jobOffer}`}  
-              
-              className="btn btn-sm btn-outline-info"
-            >
-              
-              View Job Offer
-
-            </a>
-
-            {!notif.read && (
-              <button
-                className="btn btn-sm btn-outline-primary"
-                onClick={() => handleMarkAsRead(notif._id)}
-              >
-                Mark as Read
-              </button>
-            )}
-            <button
-              className="btn btn-sm btn-outline-danger"
-              onClick={() => handleDelete(notif._id)}
-            >
-              Delete
-            </button>
-          </div>
-        </li>
-      ))
-    )}
-  </ul>
-</div>
-
-
-
-    <button onClick={backTo} className="btn btn-danger border-width-2 d-none d-lg-inline-block">
+  {pagesDropdownOpen && (
+    <ul className="dropdown-submenu list-unstyled ps-3 pt-2">
+      <li><Link to="/services" onClick={() => setMenuOpen(false)}>Services</Link></li>
+      <li><Link to="/Premium" onClick={() => setMenuOpen(false)}>Premium</Link></li>
+      <li><Link to="/portfolio" onClick={() => setMenuOpen(false)}>Portfolio</Link></li>
+      <li><Link to="/testimonials" onClick={() => setMenuOpen(false)}>Testimonials</Link></li>
+      <li><Link to="/faq.html" onClick={() => setMenuOpen(false)}>FAQ</Link></li>
+      <li><Link to="/blog" onClick={() => setMenuOpen(false)}>Blog</Link></li>
+    </ul>
+  )}
+</li>
+    </ul>
+    {(user?.role === "condidate" || user?.role === "company") && (
+  <div className="text-center mt-3">
+    <button onClick={backTo} className="btn btn-danger border-width-2 w-100">
       Log Out
     </button>
-  </>
+  </div>
+)}
+  </div>
 )}
 
-              </div>
-              <a href="#/" class=" site-menu-toggle js-menu-toggle d-inline-block d-xl-none mt-lg-2 ml-3"><span class="icon-menu h3 m-0 p-0 mt-2"></span></a>
 
-            </div>
-          </div>
+
         </div>
       </header>
 
@@ -304,75 +340,26 @@ const handleDelete = async (id) => {
          style={{ backgroundImage: 'url("/images/hero_1.jpg")'}}  
          id="home-section" >
   <div className="container">
-    <div className="row align-items-center justify-content-center"> 
-      <div className="col-md-12">
-        <div className="mb-5 text-center">
-          <h1 className="text-white font-weight-bold">
-            The Easiest Way To Get Your Dream Job
-          </h1>
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-            Cupiditate est, consequuntur perferendis.setS
-          </p>
-        </div>
-
-        {/* ← Replace your lone <input> here with the full form: */}
-        <form onSubmit={handleSearchSubmit} className="search-jobs-form">
-          <div className="row mb-5">
-            <div className="col-12 col-sm-6 col-md-6 col-lg-3 mb-4 mb-lg-0">
-              {/* This is your search input bound to searchText */}
-              <input
-                type="text"
-                className="form-control form-control-lg"
-                placeholder="Job title, Company..."
-                value={searchText}
-                onChange={(e) => setSearchText(e.target.value)}
-              />
-            </div>
-            {/* If you still want your region dropdown or button, keep them here: */}
-            <div className="col-12 col-sm-6 col-md-6 col-lg-3 mb-4 mb-lg-0">
-              <select
-              value={locationText}
-              onChange={e => setLocationText(e.target.value)}
-                data-style="btn-white btn-lg"
-                data-width="100%"
-                data-live-search="true"
-                title="Select Region"
-              >
-                <option value="">Anywhere</option>
-                <option value="sousse">sousse</option>
-                <option value="tunis">tunis</option>
-                <option value="england">england</option>
-              </select>
-            </div>
-            <div className="col-12 col-sm-6 col-md-6 col-lg-3 mb-4 mb-lg-0">
-              <button
-                type="submit"
-                className="btn btn-primary btn-lg btn-block text-white btn-search"
-              >
-                <span className="icon-search icon mr-2" />
-                Search
-              </button>
-            </div>
-          </div>
-
-          {/* trending keywords can stay here if you like */}
-          <div className="row">
-            <div className="col-md-12 popular-keywords">
-              <h3>Trending Keywords:</h3>
-              <ul className="keywords list-unstyled m-0 p-0">
-                <li><a href="#">UI Designer</a></li>
-                <li><a href="#">Python</a></li>
-                <li><a href="#">Developer</a></li>
-              </ul>
-            </div>
-          </div>
-        </form>
-        {/* ↑ Now your form lives right in the hero section */}
-
+  <div className="row align-items-center justify-content-center">
+    <div className="col-md-12">
+      <div className="mb-5 text-center">
+        <h1 className="text-white font-weight-bold">
+          The Easiest Way To Get Your Dream Job
+        </h1>
+        <p>
+          Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+          Cupiditate est, consequuntur perferendis.
+        </p>
       </div>
+  {user?.role === 'company' && <CondidateSearchForm />}
+{user?.role === 'condidate' && <CompanySearch />}
+{!user?.role && <p className="text-white text-center">Please log in to search.</p>}
+      
+
     </div>
   </div>
+</div>
+
   <a
     href="#"
     className="btn btn-lg btn-primar btn-lg-square back-to-top"
@@ -383,6 +370,7 @@ const handleDelete = async (id) => {
 
 
     </div>
+    
     
     </div>
   );

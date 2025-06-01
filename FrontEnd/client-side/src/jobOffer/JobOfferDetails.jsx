@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import jobOfferService from "../services/jobOffer";
-import commentService from "../services/comment";
+import commentService from "../services/commentService";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./jobOfferDetails.css";
-import CondidateReplyForm from "../condidate/CondidateReplyForm";
+import CompanyReplyForm from "../Companies/CreateJobOffer/CompanyReplayForm";
 import Header from "../componenets/header";
 import Footer from "../componenets/Footer";
 import { Modal, Button } from "react-bootstrap";
+import CondidateReplyForm from "../condidate/CondidateReplyForm";
 
 const JobOfferDetails = () => {
   //Hey React! Listen to the URL — grab whatever comes after /something/:id and give it to me as id. I’ll use that to know which job offer I’m dealing with
@@ -24,12 +25,15 @@ const JobOfferDetails = () => {
   //React, keep track of whether I’m showing a popup modal or not. It’s closed for now. If something happens (like clicking a button), I’ll tell you to show it with setShowModal(true) 
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
+  const user = JSON.parse(sessionStorage.getItem("user"));
 
   useEffect(() => {
     //I’m defining a helper function. This will talk to the backend and get me what I need: the job offer and its comments.
     const fetchJobOffer = async () => {
       //Hey browser, open your session storage and give me the saved ‘user’ object. I need it because it contains the token to prove who the user is
       const token = sessionStorage.getItem("user");
+      console.log("Current user:", user);
+
       //If there’s no token, stop everything! This user is not logged in or the session is broken. Log an error and don’t try to fetch protected data
       if (!token) {
         console.error("No authentication token found");
@@ -48,6 +52,7 @@ const JobOfferDetails = () => {
         }
         //Hey server again! Now give me all the comments tied to this job offer. Use the same token and ID.”
         const commentResponse = await commentService.getCommentsByJobOffer(token, id);
+
         //“If the server replies with comments, React — store them. That will update the comment section automatically. If not, log a warning
         if (commentResponse.data) {
           setComments(commentResponse.data);
@@ -55,7 +60,6 @@ const JobOfferDetails = () => {
           console.error("No comments found");
         }
       }
-      //If anything in the fetch process breaks, catch the error and clean up. No job offer, no comments — avoid showing half-loaded U
       catch (error) {
         console.error("Error fetching job offer:", error);
         setJobOffer(null);
@@ -79,6 +83,7 @@ const JobOfferDetails = () => {
     //Hey commentService, go get me all the comments for this job offer — here’s the token so you know I’m allowed to ask.
     try {
       const response = await commentService.getCommentsByJobOffer(token, id);
+            console.log("Fetched comments with replies: ", response.data);
       //"If the response has a data property, set comments to that property. If not, log an error and set comments to an empty array."
       if (response.data) {
         setComments(response.data);
@@ -101,7 +106,7 @@ const JobOfferDetails = () => {
   return (
     <div>
       <Header />
-      <div className="container mt-5">
+      <div className="containerr mt-5">
         <div className="job-details-card">
           <div className="row">
             <div className="col-md-4">
@@ -175,56 +180,74 @@ const JobOfferDetails = () => {
             </Modal.Footer>
           </Modal>
 
-          <div className="comments-section mt-4">
-            <h5>Comments</h5>
-            {/*If there are any comments in the list, show them. Otherwise, say there's nothing yet.*/}
-            {comments.length > 0 ? (
-              /* "Go through every comment and show it in its own styled card. Use index as a key (for now — ideally, you'd use comment._id). */
-              comments.map((comment, index) => (
-                <div key={index} className="comment-card">
-                  <p><strong>Condidate:</strong> {comment.condidate ? comment.condidate.name : "unknown"}</p>
-                  <p><strong>Content:</strong> {comment.content}</p>
-                  <p><strong>Status:</strong>
-                    <span className={`badge ${comment.status === "approved" ? "badge-success" : comment.status === "rejected" ? "badge-danger" : "badge-warning"}`}>
-                      {comment.status}
-                    </span>
-                  </p>
-                  {/* Convert the createdAt timestamp to a human-readable date and time */}
-                  <p><strong>Created At:</strong> {new Date(comment.createdAt).toLocaleString()}</p>
-                {/* "If the company has responded and it's an object, show their reply inside a styled box. */}
-                  {comment.companyResponse && typeof comment.companyResponse === "object" ? (
-                    <div className="mt-2 p-2 bg-light border">
-                      <p><strong>Company Response:</strong> {comment.companyResponse.message || "No message available"}</p>
-                      <p><strong>Responder:</strong> {comment.companyResponse.responder || "No responder available"}</p>
-                    </div>
-                  ) : (
-                    <p className="text-muted">No response from company yet.</p>
-                  )}
-                  {/* Check if the condidate responded (as an array of replies). If yes, list them out in a separate box. */}
-                  {Array.isArray(comment.condidateResponse) && comment.condidateResponse.length > 0 ? (
-                    <div className="mt-2 p-2 bg-light border">
-                      <strong>Condidate Responses:</strong>
-                      {/* For every reply from the condidate, show it inside a white box with padding and rounded borders. */}
-                      {comment.condidateResponse.map((response, i) => (
-                        <div key={i} className="border rounded p-2 mt-1 bg-white">
-                          <p><strong>Message:</strong> {response.message}</p>
-                          <p><strong>Responder:</strong> {response.responder}</p>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-muted">No response from condidate yet.</p>
-                  )}
-                  {/* If the company has responded, show a form where the condidate can reply. When a response is sent, refresh the comments." */}
-                  {comment.companyResponse && (
-                    <CondidateReplyForm commentId={comment._id} onResponseSent={refreshComments} />
-                  )}
-                </div>
-              ))
-            ) : (
-              <p>No comments available.</p>
-            )}
-          </div>
+<div className="comments-section mt-4">
+  <h5>Comments</h5>
+ {comments.length > 0 ? (
+  comments.map((comment, index) => (
+    <div key={index} className="comment-card mb-4 p-3 border rounded">
+      <p><strong>Condidate:</strong> {comment.condidate ? comment.condidate.name : "unknown"}</p>
+      <p><strong>Content:</strong> {comment.content}</p>
+      <p>
+        <strong>Status:</strong>{" "}
+        <span
+          className={`badge ${
+            comment.status === "approved"
+              ? "badge-success"
+              : comment.status === "rejected"
+              ? "badge-danger"
+              : "badge-warning"
+          }`}
+        >
+          {comment.status}
+        </span>
+      </p>
+      <p><strong>Created At:</strong> {new Date(comment.createdAt).toLocaleString()}</p>
+
+      {/* Company response */}
+      {comment.companyResponse && typeof comment.companyResponse === "object" ? (
+        <div className="mt-3 p-3 bg-light border rounded">
+          <p><strong>Company Response:</strong> {comment.companyResponse.message || "No message available"}</p>
+          <p><strong>Responder:</strong> {comment.companyResponse.responder || "No responder available"}</p>
+          <p><small className="text-muted">Responded at: {comment.companyResponse.createdAt ? new Date(comment.companyResponse.createdAt).toLocaleString() : "unknown"}</small></p>
+        </div>
+      ) : (
+        <>
+          <p className="text-muted mt-3">No response from company yet.</p>
+          {user?.user?.role === "company" && (
+            <CompanyReplyForm commentId={comment._id} onReplySubmitted={refreshComments} />
+          )}
+        </>
+      )}
+
+      {comment.condidateResponse && Array.isArray(comment.condidateResponse) && comment.condidateResponse.length > 0 ? (
+        <div className="mt-4">
+          <h6>Candidate Replies:</h6>
+          {comment.condidateResponse.map((reply, i) => (
+            <div key={i} className="p-2 mb-2 bg-white border rounded shadow-sm">
+              <p>{reply.message || "No message available"}</p>
+              <p><small><strong>Responder:</strong> {reply.responder || "Unknown"}</small></p>
+              <p><small className="text-muted">Replied at: {reply.createdAt ? new Date(reply.createdAt).toLocaleString() : "unknown"}</small></p>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p className="text-muted mt-3">No reply from candidate yet.</p>
+      )}
+
+      {/* Show reply form for candidate */}
+      {user?.user?.role === "condidate" && (
+        <CondidateReplyForm commentId={comment._id} onResponseSent={refreshComments} />
+      )}
+    </div>
+  ))
+) : (
+  <p>No comments available.</p>
+)}
+
+
+  
+</div>
+
 
           <div className="add-comment-form mt-4">
             <h5>Add a Comment</h5>
@@ -294,4 +317,4 @@ const JobOfferDetails = () => {
   );
 };
 
-export default JobOfferDetails;
+export default JobOfferDetails;  

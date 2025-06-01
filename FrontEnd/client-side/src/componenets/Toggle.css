@@ -1,0 +1,133 @@
+
+.align-items-center {
+  align-items: center !important;
+  display: flex;
+  justify-content: space-around;
+}
+.menu-toggle-btn {
+  background-color: transparent;
+  border: 2px solid #0d6efd; 
+  color: #f0f0f0;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  position: relative;
+  z-index: 4;
+  width: 50px;
+}
+
+.menu-toggle-btn:hover {
+  background-color: #0d6efd;
+  color: white;
+  transform: scale(1.05);
+}
+
+.mobile-menu {
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+  position: absolute;
+  top: 100%;
+  right: 1rem;
+  margin-top: 0.5rem;
+  z-index: 3;
+  min-width: 240px;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.mobile-menu ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.mobile-menu li {
+  margin-bottom: 10px;
+}
+
+.mobile-menu li:last-child {
+  margin-bottom: 0;
+}
+
+.mobile-menu a {
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+  display: block;
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+}
+
+.mobile-menu a:hover {
+  background-color: #f0f0f0;
+}
+
+.mobile-menu-hidden {
+  opacity: 0;
+  transform: translateY(-10px);
+  pointer-events: none;
+}
+.menu-close-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #333;
+  position: absolute;
+   display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  top: 1rem;
+  right: 1rem;
+  cursor: pointer;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.menu-close-btn:hover {
+  color: #f0f0f0;
+  transform: scale(1.2);
+}
+.dropdown-toggle-btn {
+  background: none;
+  border: none;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #333;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 0.5rem 0;
+  cursor: pointer;
+}
+
+.dropdown-toggle-btn .arrow {
+  transition: transform 0.3s ease;
+  font-size: 0.9rem;
+}
+
+.dropdown-toggle-btn .arrow.rotate {
+  transform: rotate(180deg);
+}
+
+.dropdown-submenu li a {
+  font-weight: normal;
+  font-size: 0.95rem;
+  color: #444;
+  display: block;
+  padding: 0.3rem 0;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.dropdown-submenu li a:hover {
+  color: #007bff;
+}
+
+

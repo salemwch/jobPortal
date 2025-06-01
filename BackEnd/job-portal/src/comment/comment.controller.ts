@@ -12,10 +12,8 @@ import {
 } from '@nestjs/common';
 import { CommentService } from './comment.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
-import { UpdateCommentDto } from './dto/update-comment.dto';
 import { RespondToCommentDto } from './respondToComment';
 import { ModerateCommentDto } from './moderatecommentDto';
-import { query, response } from 'express';
 import { Types } from 'mongoose';
 
 @Controller('comment')

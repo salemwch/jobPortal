@@ -1,10 +1,7 @@
 import {
-  ArrayMinSize,
-  IsArray,
   IsEnum,
   IsMongoId,
   IsNotEmpty,
-  IsNumber,
   IsOptional,
   IsString,
 } from 'class-validator';

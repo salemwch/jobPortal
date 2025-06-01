@@ -32,7 +32,7 @@ const Login = () => {
         if(role === 'condidate'){
           navigate('/condidateDashboard');
         }else if(role === 'company'){
-          navigate('/DashboardCompanie');
+          navigate('/Dashboard/company');
         }else if(role ==='admin'){
           alert('only condidate and company can log here ');
         }

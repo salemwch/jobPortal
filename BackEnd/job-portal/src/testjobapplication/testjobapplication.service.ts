@@ -10,12 +10,9 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { IJobTest } from './interface/interfacetest';
 import { JobOffer } from 'src/joboffer/entities/joboffer.entity';
-import { Condidate } from 'src/condidates/entities/condidate.entity';
 import { ICondidate } from 'src/condidates/Interface/interface';
-import { TestJobApplication } from './entities/testjobapplication.entity';
-import { JobApplication } from 'src/jobapplication/entities/jobapplication.entity';
-import { Mode } from 'fs';
 import { IUser } from 'src/user/Interface/IUser';
+import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class TestJobApplicationService {
@@ -25,7 +22,7 @@ export class TestJobApplicationService {
     @InjectModel('JobOffer') private readonly jobOfferModel: Model<JobOffer>,
     @InjectModel('condidate')
     private readonly condidateModel: Model<ICondidate>,
-    @InjectModel('user') private readonly userModel: Model<IUser>
+    @InjectModel(User.name) private readonly userModel: Model<IUser>
   ) {}
   async create(
     createJobTestDto: CreateTestJobApplicationDto

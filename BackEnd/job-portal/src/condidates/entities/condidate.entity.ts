@@ -16,7 +16,10 @@ export class Condidate extends Document {
   education?: string;
   @Prop()
   workExperience?: string;
-  @Prop()
+  @Prop({
+    type: [String],
+    set: (skills: string[]) => skills.filter(item => item.trim() !== ''),
+  })
   skills?: string[];
   @Prop()
   location?: string;
@@ -40,6 +43,8 @@ export class Condidate extends Document {
   viewCount: number;
   @Prop({ default: Date.now })
   createdAt: Date;
+  @Prop()
+  description?: string;
   readonly role: UserRole;
 }
 export const CondidateSchema = SchemaFactory.createForClass(Condidate);

@@ -56,6 +56,14 @@ const submitTestResult = (token, id) => {
     headers: { Authorization: `Bearer ${token}` },
   });
 };
+const getApplicantsByJobOffer = (token, id) => {
+  return HTTP.get(
+    `/jobapplication/${id}/applicants`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+};
 
 export default {
   createJobApplication,
@@ -67,4 +75,5 @@ export default {
   evaluateTestResult,
   updateJobApplicationStatus,
   submitTestResult,
+  getApplicantsByJobOffer,
 };

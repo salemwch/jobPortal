@@ -11,23 +11,23 @@ import { interfaceAdmin } from './Interface/InterfaceAdmin';
 import * as argon2 from 'argon2';
 import { JobOfferService } from 'src/joboffer/joboffer.service';
 import { JobApplicationService } from 'src/jobapplication/jobapplication.service';
-import { TestJobApplicationService } from 'src/testjobapplication/testjobapplication.service';
 import { IUser } from 'src/user/Interface/IUser';
 import { UserRole } from 'src/userRole/userRole';
 import { ICondidate } from 'src/condidates/Interface/interface';
-import { Condidate } from 'src/condidates/entities/condidate.entity';
 import { ICompany } from 'src/company/Interface/Interface';
 import { IJobOffer } from 'src/joboffer/interface/InterfaceJobOffer';
 import { IJobApplication } from 'src/jobapplication/interface/interfaceJobApplication';
 import { ApplicationStatus } from 'src/jobapplication/enumApplication';
+import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class AdminService {
   constructor(
-    @InjectModel('user') private adminModel: Model<interfaceAdmin>,
+    @InjectModel('admin') private adminModel: Model<interfaceAdmin>,
     @InjectModel('condidate') private condidateModel: Model<ICondidate>,
     @InjectModel('company') private companyModel: Model<ICompany>,
     private readonly jobOfferService: JobOfferService,
+    @InjectModel(User.name) private userModel: Model<IUser>,
     private readonly jobApplicationService: JobApplicationService
   ) {}
   async create(createAdminDto: CreateAdminDto): Promise<interfaceAdmin> {
@@ -188,5 +188,14 @@ export class AdminService {
   }
   async findAdminById(id: string): Promise<interfaceAdmin> {
     return this.adminModel.findById(id);
+  }
+  async findUserById(id: string): Promise<IUser> {
+    const user = await this.userModel
+      .findById(id)
+      .select('name email location role');
+    if (!user) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+    return user;
   }
 }

@@ -30,7 +30,7 @@ const updateJobOffer = (token, id, updatedData) => {
   });
 };
 
-const deleteJobOffer = (token, id) => {
+const deleteJobOffer = (id,token) => {
   return HTTP.delete(`/job-offer/${id}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
@@ -55,7 +55,7 @@ const updateStatus = (token, id, data) =>{
     }
   })
 }
-const getJobIffersByCompany = (companyId, token)=>{
+const getJobOffersByCompany = (companyId, token)=>{
   return HTTP.get(`job-offer/company/${companyId}`,{
     headers:{
       Authorization: `Bearer ${token}`
@@ -78,6 +78,6 @@ export default {
   incrementViewCount,
   getMostViewedJobOffers,
   updateStatus,
-  getJobIffersByCompany,
+  getJobOffersByCompany,
   findTestsByJobOfferId
 };

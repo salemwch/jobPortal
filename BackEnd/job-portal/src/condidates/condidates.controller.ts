@@ -14,6 +14,7 @@ import {
   NotFoundException,
   BadRequestException,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { CondidatesService } from './condidates.service';
 import { CreateCondidateDto } from './dto/create-condidate.dto';
@@ -43,6 +44,7 @@ export class CondidatesController {
     @UploadedFile() file
   ) {
     try {
+      console.log(createCondidateDto);
       if (file) {
         createCondidateDto.image = file?.filename;
       }
@@ -86,21 +88,7 @@ export class CondidatesController {
       });
     }
   }
-  @Get(':id')
-  async getCondidateById(@Res() response, @Param('id') id: string) {
-    const getCondidateById = await this.condidatesService.getCondidateByID(id);
-    if (!getCondidateById) {
-      throw new NotFoundException(`Condidate with id ${id} not found`);
-    }
-    if (!Types.ObjectId.isValid(id)) {
-      throw new BadRequestException('invalid condidate Id');
-    }
-    return response.status(HttpStatus.OK).json({
-      message: 'Condidate fetched successfully',
-      getCondidateById,
-      statusCode: 200,
-    });
-  }
+
   @UseGuards(RefreshTokenGuards)
   @Put(':id')
   @UseInterceptors(
@@ -129,7 +117,7 @@ export class CondidatesController {
       if (!updateCondidate) {
         return response.status(HttpStatus.NOT_FOUND).json({
           message: 'condidate not found',
-          statusCode: 400,
+          statusCode: 404,
         });
       }
       return response.status(HttpStatus.CREATED).json({
@@ -145,6 +133,62 @@ export class CondidatesController {
       });
     }
   }
+  @Get('search')
+  async searchCandidates(
+    @Res() response,
+    @Query('name') name?: string,
+    @Query('skills') skills?: string,
+    @Query('email') email?: string,
+    @Query('location') location?: string
+  ) {
+    try {
+      const candidates = await this.condidatesService.searchCondidate({
+        name,
+        skills,
+        email,
+        location,
+      });
+
+      if (!candidates.length) {
+        return response.status(HttpStatus.NOT_FOUND).json({
+          message: 'No candidates found matching search criteria',
+          statusCode: HttpStatus.NOT_FOUND,
+        });
+      }
+
+      return response.status(HttpStatus.OK).json({
+        message: 'Successfully retrieved candidates',
+        candidates,
+        count: candidates.length,
+        statusCode: HttpStatus.OK,
+      });
+    } catch (error) {
+      return response.status(HttpStatus.BAD_REQUEST).json({
+        message: 'Error searching candidates',
+        error: error,
+        statusCode: HttpStatus.BAD_REQUEST,
+      });
+    }
+  }
+  @Get('by-id/:id')
+  async getCondidateById(@Res() response, @Param('id') id: string) {
+    if (!Types.ObjectId.isValid(id)) {
+      throw new BadRequestException('Invalid condidate ID');
+    }
+
+    const getCondidateById = await this.condidatesService.getCondidateByID(id);
+
+    if (!getCondidateById) {
+      throw new NotFoundException(`Condidate with id ${id} not found`);
+    }
+
+    return response.status(HttpStatus.OK).json({
+      message: 'Condidate fetched successfully',
+      getCondidateById,
+      statusCode: 200,
+    });
+  }
+
   @Get(':email')
   async getCondidate(@Res() response, @Param('email') email: string) {
     const condidate = await this.condidatesService.findByEmail(email);

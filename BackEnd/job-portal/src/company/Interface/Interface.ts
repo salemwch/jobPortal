@@ -6,7 +6,7 @@ export interface ICompany extends Document {
   name: string;
   email: string;
   password: string;
-  speciality: string[];
+  speciality?: string[];
   phone: number;
   website: string;
   location: string;
@@ -15,6 +15,7 @@ export interface ICompany extends Document {
   status: string;
   createdAt: Date;
   viewCount: number;
+  description: string;
 }
 export interface PopulatedJobOffer extends Omit<IJobOffer, 'company'> {
   company: ICompany;

@@ -10,7 +10,7 @@ export function getProfileRoute(user) {
 export function getDashboardRoute(user) {
   if (!user) return "/login";
 
-  if (user.role === "company") return "/DashboardCompanie";
+  if (user.role === "company") return "/Dashboard/company";
   if (user.role === "condidate") return "/condidateDashboard";
 
   return "/";

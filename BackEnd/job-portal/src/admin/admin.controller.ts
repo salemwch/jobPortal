@@ -39,7 +39,7 @@ export class AdminController {
       storage: diskStorage({
         destination: './uploads',
         filename: (req, file, callback) =>
-          callback(null, `${new Date().getTime}-${file.originalname}`),
+          callback(null, `${new Date().getTime()}-${file.originalname}`),
       }),
     })
   )
@@ -370,5 +370,10 @@ export class AdminController {
         statusCode: 400,
       });
     }
+  }
+  @Get('users/:id')
+  @UseGuards(RoleGuard)
+  async getUserById(@Param('id') id: string) {
+    return this.adminService.findUserById(id);
   }
 }

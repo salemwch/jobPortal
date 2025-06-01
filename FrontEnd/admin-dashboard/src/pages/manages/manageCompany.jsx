@@ -92,12 +92,7 @@ const ManageCompanies = () => {
                 Search
               </button>
             </div>
-            <button
-              className="btn btn-primary"
-              onClick={() => window.location.href = '/dashboard/companies/new'}
-            >
-              Add Company
-            </button>
+            
           </div>
         </div>
 
@@ -120,6 +115,7 @@ const ManageCompanies = () => {
                   <td>{company.email}</td>
                   <td>{company.phone}</td>
                   <td>{company.location}</td>
+                  
                   <td>
                     <span className={`badge ${
                       company.status === 'approved' ? 'bg-success' :

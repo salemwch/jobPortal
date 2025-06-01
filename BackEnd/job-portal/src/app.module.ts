@@ -18,9 +18,13 @@ import { MailModule } from './mailtrap/mailmodule';
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://localhost:27017', {
-      dbName: 'JobPortal',
-    }),
+    MongooseModule.forRoot(
+      process.env.MONGO_URI || 'mongodb://localhost:27017',
+      {
+        dbName: process.env.MONGO_DB || 'JobPortal',
+        autoIndex: process.env.NODE_ENV !== 'production',
+      }
+    ),
     UserModule,
     AuthModule,
     AdminModule,

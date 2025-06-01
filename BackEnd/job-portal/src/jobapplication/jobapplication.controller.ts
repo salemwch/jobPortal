@@ -46,15 +46,12 @@ export class JobApplicationController {
   async create(
     @Res() response,
     @UploadedFile() file: Express.Multer.File,
-    @Body() createJobApplicationDto: CreateJobApplicationDto,
+    @Body() createJobApplicationDto: CreateJobApplicationDto
   ) {
     try {
-      // Attach file name to DTO
       if (file) {
         createJobApplicationDto.cvUrl = file.filename;
       }
-
-      // Validate condidate and jobOffer IDs
       if (
         !createJobApplicationDto.condidate ||
         !this.isValidObjectId(createJobApplicationDto.condidate)
@@ -70,7 +67,7 @@ export class JobApplicationController {
       }
 
       const createdJobApplication = await this.jobApplicationService.create(
-        createJobApplicationDto,
+        createJobApplicationDto
       );
 
       return response.status(HttpStatus.CREATED).json({
@@ -87,7 +84,6 @@ export class JobApplicationController {
     }
   }
 
-  // Helper function to check if a string is a valid ObjectId
   private isValidObjectId(id: string): boolean {
     return /^[0-9a-fA-F]{24}$/.test(id);
   }
@@ -261,7 +257,28 @@ export class JobApplicationController {
     } catch (error) {
       return response.status(HttpStatus.BAD_REQUEST).json({
         message: 'failed to submit test result',
-        error: error,
+        error: (error as Error).message,
+        statusCode: 400,
+      });
+    }
+  }
+  @Get('/:id/applicants')
+  async getApplicantsByJobOffer(
+    @Res() response,
+    @Param('id') jobOfferId: string
+  ) {
+    try {
+      const getApplyed =
+        await this.jobApplicationService.getApplicantsByJobOffer(jobOfferId);
+      return response.status(HttpStatus.OK).json({
+        message: 'Applicants fetched successfully',
+        getApplyed,
+        statusCode: 200,
+      });
+    } catch (error) {
+      return response.status(HttpStatus.BAD_REQUEST).json({
+        message: 'failed to fetch applicants',
+        error: (error as Error).message,
         statusCode: 400,
       });
     }

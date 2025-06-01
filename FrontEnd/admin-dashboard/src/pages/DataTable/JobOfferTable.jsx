@@ -130,11 +130,16 @@ const JobOfferTable = () => {
                 <br />
                 <strong>Created At:</strong>{" "}
                 {new Date(comment.createdAt).toLocaleString()} <br/><br/>
-                <strong>Company:</strong> {comment.company.name} <br />
-                <strong>Responder:</strong> {comment.companyResponse.responder} <br />
-                <strong>Response:</strong> {comment.companyResponse.message} <br />
+                <strong>Company:</strong> {comment.company?.name} <br />
+                {comment.companyResponse ? (
+  <>
+    <strong>Responder:</strong> {comment.companyResponse.responder} <br />
+    <strong>Response:</strong> {comment.companyResponse.message} <br />
+  </>
+) : (
+  <p className="text-muted">No response from company yet.</p>
+)}
               
-                {/* 👉 New part for condidateResponse */}
                 {Array.isArray(comment.condidateResponse) && comment.condidateResponse.length > 0 ? (
                   <div className="mt-2 p-2 bg-light border">
                     <strong>Condidate Responses:</strong>

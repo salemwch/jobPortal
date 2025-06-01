@@ -17,7 +17,6 @@ const Home = () => {
       <Header/>
       {/*  Header End */}
       <div className="container-fluid">
-  
    <Outlet/>
 
 

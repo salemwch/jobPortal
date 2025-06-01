@@ -70,7 +70,7 @@ export class AuthService {
       await this.userService.update(ID, { refreshToken: null });
       return { success: true, message: 'Logout successful' };
     } catch (error) {
-      return { message: 'Bad request' };
+      return { message: 'Bad request', error };
     }
   }
 

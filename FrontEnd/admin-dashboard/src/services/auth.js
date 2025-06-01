@@ -12,12 +12,28 @@ const forgetPassword = (data) =>{
 const resetPassword = (token, data) =>{
     return HTTP.post(`/auth/reset-password/${token}`, data);
 }
-const createAdmin = (data) =>{
-    return HTTP.post("/admin", data);
-}
-const updateProfile = (id, data)=>{
-    return HTTP.put(`/auth/update/${id}`, data);
-}
+
+const updateProfile = (id, updateData, token) => {
+  const formData = new FormData();
+
+  if (updateData.file) {
+    formData.append('file', updateData.file);
+  }
+
+  for (const key in updateData) {
+    if (key !== 'file' && updateData[key]) {
+      formData.append(key, updateData[key]);
+    }
+  }
+
+  return HTTP.put(`/auth/update/${id}`, formData, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "multipart/form-data",
+    },
+  });
+};
+
 const deleteAccount = (id) =>{
     return HTTP.delete(`/auth/delete/${id}`);
 }
@@ -26,4 +42,4 @@ const getAllUsers = () =>{
 }
 
 
-export default{signIN,logout,forgetPassword,resetPassword,createAdmin,updateProfile,deleteAccount,getAllUsers};
+export default{signIN,logout,forgetPassword,resetPassword,updateProfile,deleteAccount,getAllUsers};

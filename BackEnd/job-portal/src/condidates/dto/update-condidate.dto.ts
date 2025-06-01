@@ -1,6 +1,13 @@
 import { PartialType } from '@nestjs/mapped-types';
-import { Type } from 'class-transformer';
-import { IsEmail, IsNumber, IsOptional, IsString } from 'class-validator';
+import { Transform, Type } from 'class-transformer';
+import {
+  IsArray,
+  IsEmail,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 import { CreateCondidateDto } from './create-condidate.dto';
 
 export class UpdateCondidateDto extends PartialType(CreateCondidateDto) {
@@ -14,9 +21,22 @@ export class UpdateCondidateDto extends PartialType(CreateCondidateDto) {
   @IsOptional()
   @IsString()
   workExperience?: string;
-
+  @IsArray()
   @IsOptional()
-  @IsString()
+  @IsString({ each: true })
+  @Transform(({ value }) => {
+    if (typeof value === 'string') {
+      try {
+        return JSON.parse(value);
+      } catch {
+        return value
+          .split(',')
+          .map(s => s.trim())
+          .filter(s => s);
+      }
+    }
+    return value;
+  })
   skills?: string[];
 
   @IsOptional()
@@ -30,7 +50,7 @@ export class UpdateCondidateDto extends PartialType(CreateCondidateDto) {
   @IsOptional()
   @IsString()
   name?: string;
-
+  @IsNotEmpty()
   @IsOptional()
   @IsEmail()
   email?: string;

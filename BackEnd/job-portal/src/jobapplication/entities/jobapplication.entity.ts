@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, SchemaTypes, Types } from 'mongoose';
 import { ApplicationStatus } from '../enumApplication';
+import { User } from 'src/user/entities/user.entity';
 
 @Schema({ timestamps: true })
 export class JobApplication extends Document {
@@ -19,7 +20,7 @@ export class JobApplication extends Document {
     answer?: string | null;
     isCorrect?: boolean | null;
   }[];
-  @Prop({ type: SchemaTypes.ObjectId, ref: 'User', required: false })
+  @Prop({ type: SchemaTypes.ObjectId, ref: User.name, required: false })
   condidate?: Types.ObjectId;
   @Prop({ type: SchemaTypes.ObjectId, ref: 'JobOffer', required: true })
   jobOffer: Types.ObjectId;

@@ -22,6 +22,9 @@ A professional, full-featured job portal built with **NestJS**, **MongoDB**, and
 - **Bootstrap & React-Bootstrap** — Styling & layout
 - **User dashboards** for each role
 - **WebSocket & Socket.IO** Real-time communication for notifications and updates
+- **Comment** Real-time comments byt companies and candidates
+
+
 ---
 
 ## 👥 User Roles & Features
@@ -79,12 +82,7 @@ A professional, full-featured job portal built with **NestJS**, **MongoDB**, and
 
 ### 🔐 Storage Decision
 
-- We use `sessionStorage` instead of `localStorage` for storing login sessions.
-- This ensures:
-  - User data clears when the tab is closed.
-  - Better security on shared/public machines.
-  - Avoids issues when using multiple tabs.
----
+Working to add http only cookie soon
 
 
 ## 🏁 How to Run Locally

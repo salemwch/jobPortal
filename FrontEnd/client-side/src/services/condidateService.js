@@ -26,7 +26,7 @@ const getAllCondidates = (token) => {
     });
 };
 const getCondidateById = (token, id) => {
-    return HTTP.get(`/condidates/${id}`, {
+    return HTTP.get(`/condidates/by-id/${id}`, {
         headers: {
             Authorization: `Bearer ${token}`
         }
@@ -41,21 +41,25 @@ const getCondidateByEmail = (token, email) => {
 };
 
 const updateProfile = (token, id, data, file) => {
-    const formData = new FormData();
-    if (file) {
-      formData.append('file', file);
-    }
-    Object.keys(data).forEach(key => {
-      formData.append(key, data[key]);
-    });
+  const formData = new FormData();
   
-    return HTTP.put(`/condidates/${id}`, formData, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'multipart/form-data'
-      }
-    });
-  };
+  if (file) formData.append('file', file);
+  
+  Object.keys(data).forEach(key => {
+    if (Array.isArray(data[key])) {
+      formData.append(key, JSON.stringify(data[key]));
+    } else if (data[key] !== undefined) {
+      formData.append(key, data[key]);
+    }
+  });
+
+  return HTTP.put(`/condidates/${id}`, formData, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'multipart/form-data'
+    }
+  });
+};
   
 
 const deleteCondidate = (token, id) => {
@@ -81,7 +85,21 @@ const getMostVisitedCondidates = (token) => {
         }
     });
 };
+const searchCandidates = (token, { name, skills, email, location }) => {
+  const params = {};
 
+  if (name) params.name = name;
+  if (skills) params.skills = skills;
+  if (email) params.email = email;
+  if (location) params.location = location;
+
+  return HTTP.get('/condidates/search', {
+    params,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
 const incrementViewCount = (token, profileId, viewerId) => {
     return HTTP.patch(
       `/condidates/${profileId}/viewCount`,
@@ -97,5 +115,5 @@ const incrementViewCount = (token, profileId, viewerId) => {
 
 
 export default {
-    registerCondidate, getAllCondidates, getCondidateByEmail, updateProfile, deleteCondidate, updateDesiredFields, getMostVisitedCondidates, incrementViewCount, getCondidateById
+    registerCondidate, getAllCondidates, getCondidateByEmail, updateProfile, deleteCondidate, updateDesiredFields, getMostVisitedCondidates, incrementViewCount, getCondidateById,searchCandidates
 };

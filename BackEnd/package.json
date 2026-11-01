@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@nestjs-modules/mailer": "^1.6.1",
+    "@nestjs-modules/mailer": "^1.11.2",
     "@nestjs/cli": "^10.4.2",
     "@nestjs/config": "^4.0.0",
     "@nestjs/jwt": "^11.0.0",
@@ -14,7 +14,7 @@
     "mjml": "^4.7.1",
     "mjml-cli": "^4.7.1",
     "mongoose": "^8.9.5",
-    "nodemailer": "^6.9.16",
+    "nodemailer": "^10.3.1",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1"
   },

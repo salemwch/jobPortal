@@ -13,7 +13,7 @@
     "jsonwebtoken": "^9.0.2",
     "mjml": "^4.7.1",
     "mjml-cli": "^4.7.1",
-    "mongoose": "^8.9.5",
+    "mongoose": "^8.24.8",
     "nodemailer": "^6.9.16",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1"
